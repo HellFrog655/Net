@@ -201,18 +201,17 @@ thead th:hover { color: var(--text); }
 thead th .si { margin-left: 3px; opacity: 0.35; }
 thead th.sorted .si { opacity: 1; color: var(--accent); }
 
-tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr { box-shadow: inset 0 -1px 0 var(--border); }
 tbody tr:hover { background: #111E30; }
 
 tbody tr.grp-hdr td {
   background: #0B1A2C;
-  padding: 5px 14px;
   font-size: 11px;
   color: #3A7AC0;
   font-weight: 700;
   letter-spacing: 0.06em;
-  border-bottom: 1px solid #152030;
 }
+tbody tr.grp-hdr { box-shadow: inset 0 -1px 0 #152030; }
 
 td { padding: 7px 14px; white-space: nowrap; }
 
@@ -341,7 +340,7 @@ tbody tr:not(.grp-hdr):hover td.a-end { background: #111E30; }
 
 <div class="count-bar">แสดง <span class="cnt" id="row-count">–</span> รายการ</div>
 
-<div class="table-wrap">
+<div class="table-wrap" id="table-wrap">
   <table>
     <thead>
       <tr>
@@ -461,7 +460,60 @@ document.querySelectorAll('thead th[data-col]').forEach(th => {
   });
 });
 
-// ── Render ──
+// ── Render (virtualized: only the rows on screen ever touch the DOM,
+//    so scrolling stays smooth on mobile even with 3,456 rows) ──
+const ROW_H = 31; // px — must match the height set on each <tr> below
+const BUFFER = 10; // extra rows rendered above/below the viewport
+
+const wrapEl = document.getElementById('table-wrap');
+const tbody  = document.getElementById('tbody');
+const empty  = document.getElementById('empty');
+
+let flatRows = []; // flattened list of {type:'group',label} / {type:'data',r}
+let rafId = null;
+
+function rowHTML(item) {
+  if (item.type === 'group') {
+    return `<tr class="grp-hdr" style="height:${ROW_H}px"><td colspan="6">▸ ${item.label}</td></tr>`;
+  }
+  const r = item.r;
+  const c = LEN_COLORS[r[4]]||'#888';
+  const roomClass = r[5]; // dh61 or dh62
+  return `<tr style="height:${ROW_H}px">
+      <td class="a-end">${r[0]}</td>
+      <td class="port">${r[1]}</td>
+      <td class="arrow">→</td>
+      <td class="z-end ${roomClass}">${r[2]}<span class="room-chip ${roomClass}">${r[5].toUpperCase()}</span></td>
+      <td class="port">${r[3]}</td>
+      <td><span class="len-badge" style="background:${c}">${r[4]} m</span></td>
+    </tr>`;
+}
+
+function renderWindow() {
+  const total = flatRows.length;
+  if (!total) { tbody.innerHTML = ''; return; }
+
+  const viewportH = wrapEl.clientHeight;
+  let start = Math.floor(wrapEl.scrollTop / ROW_H) - BUFFER;
+  let end   = Math.ceil((wrapEl.scrollTop + viewportH) / ROW_H) + BUFFER;
+  start = Math.max(0, start);
+  end   = Math.min(total, end);
+
+  const topH = start * ROW_H;
+  const botH = (total - end) * ROW_H;
+
+  let html = '';
+  if (topH > 0) html += `<tr style="height:${topH}px"><td colspan="6" style="padding:0;border:0"></td></tr>`;
+  for (let i = start; i < end; i++) html += rowHTML(flatRows[i]);
+  if (botH > 0) html += `<tr style="height:${botH}px"><td colspan="6" style="padding:0;border:0"></td></tr>`;
+  tbody.innerHTML = html;
+}
+
+wrapEl.addEventListener('scroll', () => {
+  if (rafId) return;
+  rafId = requestAnimationFrame(() => { rafId = null; renderWindow(); });
+}, { passive: true });
+
 function render() {
   let data = RAW;
   if (filterRoom) data = data.filter(r => r[5]===filterRoom);
@@ -480,33 +532,23 @@ function render() {
 
   document.getElementById('row-count').textContent = data.length.toLocaleString();
 
-  const tbody = document.getElementById('tbody');
-  const empty = document.getElementById('empty');
-  if (!data.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  if (!data.length) { flatRows=[]; tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display = 'none';
 
   // group header when sorting by A-End and not filtered to single pos
   const showGroups = !filterPos && sortCol===0;
-  const rows = [];
+  flatRows = [];
   let lastPos = null;
-
   for (const r of data) {
     if (showGroups && r[0]!==lastPos) {
       lastPos = r[0];
-      rows.push(`<tr class="grp-hdr"><td colspan="6">▸ ${r[0]}</td></tr>`);
+      flatRows.push({type:'group', label:r[0]});
     }
-    const c = LEN_COLORS[r[4]]||'#888';
-    const roomClass = r[5]; // dh61 or dh62
-    rows.push(`<tr>
-      <td class="a-end">${r[0]}</td>
-      <td class="port">${r[1]}</td>
-      <td class="arrow">→</td>
-      <td class="z-end ${roomClass}">${r[2]}<span class="room-chip ${roomClass}">${r[5].toUpperCase()}</span></td>
-      <td class="port">${r[3]}</td>
-      <td><span class="len-badge" style="background:${c}">${r[4]} m</span></td>
-    </tr>`);
+    flatRows.push({type:'data', r});
   }
-  tbody.innerHTML = rows.join('');
+
+  wrapEl.scrollTop = 0;
+  renderWindow();
 }
 
 render();
