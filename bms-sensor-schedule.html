@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="th" data-lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GMI BMS Sensor Point Schedule — DH 6-1 / 6-2</title>
+<style>
+:root{
+  --ink:#101418; --paper:#FBFAF7; --rule:#C9C4B8; --rule-soft:#E4E0D6; --muted:#6B6559;
+  --lc:#1B87C9; --it:#5E8C4A; --dp:#9B2D8F; --sd:#D8323C; --tob:#E07B18; --sv:#3F6EA8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans","Noto Sans Thai","Noto Sans Myanmar","Padauk","Noto Sans SC",
+              -apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.6;
+}
+html[data-lang="my"] body{line-height:1.9}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 90px}
+
+header.mast{border-bottom:2px solid var(--ink);padding:30px 0 16px;margin-bottom:8px}
+.kicker{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;
+        text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(22px,3.6vw,33px);line-height:1.2;margin:8px 0 6px;font-weight:650;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:14px;max-width:66ch;margin:0}
+.mastfoot{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:16px;
+          font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted)}
+
+.langbar{position:sticky;top:0;z-index:20;background:var(--paper);
+         border-bottom:1px solid var(--rule-soft);padding:9px 0;margin-bottom:26px}
+.langbar .inner{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+button.lang{font:inherit;font-size:12px;letter-spacing:.03em;border:1px solid var(--rule);
+            background:transparent;color:var(--muted);padding:5px 13px;border-radius:2px;cursor:pointer}
+button.lang[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.lang:focus-visible{outline:2px solid var(--lc);outline-offset:2px}
+.langbar .src{font-size:11px;color:var(--muted);margin-left:auto;
+              font-family:ui-monospace,Menlo,Consolas,monospace}
+.pagelinks{display:flex;gap:7px;margin-left:auto}
+.pagelinks a{font-size:12px;letter-spacing:.02em;border:1px solid var(--rule);color:var(--ink);
+             text-decoration:none;padding:5px 12px;border-radius:2px;white-space:nowrap}
+.pagelinks a:hover{border-color:var(--ink)}
+@media (max-width:640px){ .pagelinks{margin-left:0;order:3;width:100%} .pagelinks a{flex:1;text-align:center} }
+
+.alert{border:1px solid var(--rule);border-left:4px solid var(--tob);background:#fff;
+       padding:14px 18px;margin:0 0 30px;font-size:13.5px}
+.alert b{font-weight:650}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:#F1EEE6;padding:1px 4px;border-radius:2px}
+
+section{margin:0 0 46px;scroll-margin-top:60px}
+.shead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+       border-bottom:1px solid var(--ink);padding-bottom:7px;margin-bottom:6px}
+.snum{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.shead h2{font-size:19px;margin:0;font-weight:640;letter-spacing:-.005em}
+.chip{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.06em;
+      text-transform:uppercase;padding:2px 7px;border-radius:2px;color:#fff;white-space:nowrap}
+.c-lc{background:var(--lc)} .c-it{background:var(--it)} .c-dp{background:var(--dp)}
+.c-sd{background:var(--sd)} .c-tob{background:var(--tob)} .c-sv{background:var(--sv)}
+
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:0;border:1px solid var(--rule-soft);background:#fff;margin:14px 0 20px}
+.spec div{padding:10px 14px;border-right:1px solid var(--rule-soft)}
+.spec div:last-child{border-right:none}
+.spec dt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.1em;
+         text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.spec dd{margin:0;font-size:13.5px;font-weight:550}
+
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px}
+table{border-collapse:collapse;width:100%;min-width:680px;background:#fff;font-size:13.5px}
+caption{text-align:left;font-size:11.5px;color:var(--muted);padding:0 0 7px;
+        font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.05em}
+th,td{border:1px solid var(--rule-soft);padding:7px 10px;text-align:left;vertical-align:top}
+thead th{background:#F1EEE6;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+         font-weight:600;color:var(--muted)}
+tbody tr:hover{background:#FAF7F0}
+td.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+td.rack{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:650;font-size:13px}
+td.u{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:650}
+.rowtag{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:2px;
+        font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;font-weight:700;color:#fff;margin-right:7px}
+.r-lc{background:var(--lc)} .r-it{background:var(--it)}
+tr.band td{border-top:2px solid var(--rule)}
+
+.note-list{border:1px solid var(--rule-soft);background:#fff;padding:14px 18px 14px 34px;margin:0;font-size:13.5px}
+.note-list li{margin:0 0 7px}
+.note-list li:last-child{margin-bottom:0}
+h3.mini{font-size:13px;margin:22px 0 8px;font-weight:640}
+
+.check{border:1px solid var(--rule-soft);background:#fff;padding:4px 0}
+.check label{display:flex;gap:11px;align-items:flex-start;padding:9px 16px;
+             border-bottom:1px solid var(--rule-soft);cursor:pointer;font-size:13.5px}
+.check label:last-child{border-bottom:none}
+.check input{margin-top:4px;flex:none;width:15px;height:15px;accent-color:var(--lc)}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+
+nav.toc{border:1px solid var(--rule-soft);background:#fff;padding:14px 18px;margin:0 0 34px}
+nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:34px;font-size:13px}
+nav.toc li{margin-bottom:5px;break-inside:avoid}
+nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule-soft)}
+nav.toc a:hover{border-bottom-color:var(--ink)}
+
+footer{border-top:1px solid var(--rule);margin-top:44px;padding-top:16px;font-size:12px;color:var(--muted)}
+
+@media (max-width:640px){
+  body{font-size:14px}
+  .wrap{padding:0 14px 70px}
+  header.mast{padding:20px 0 12px}
+  .langbar .inner{padding:0 14px}
+  button.lang{padding:8px 14px;font-size:12.5px}
+  .langbar .src{display:none}
+  nav.toc{padding:12px 14px}
+  nav.toc ol{columns:1}
+  .spec div{border-right:none;border-bottom:1px solid var(--rule-soft)}
+  .shead h2{font-size:16.5px}
+  table{font-size:12.5px}
+  th,td{padding:6px 8px}
+  .check label{padding:11px 14px}
+  .check input{width:19px;height:19px}
+}
+@media print{
+  .langbar{display:none} body{font-size:11px} section{page-break-inside:avoid}
+  table{min-width:0} .scroll{overflow:visible}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="langbar"><div class="inner">
+  <button class="lang" data-set="th" aria-pressed="true">ไทย</button>
+  <button class="lang" data-set="zh" aria-pressed="false">中文</button>
+  <button class="lang" data-set="en" aria-pressed="false">English</button>
+  <button class="lang" data-set="my" aria-pressed="false">မြန်မာ</button>
+  <div class="pagelinks">
+    <a href="index.html">📄 NIC / IP</a>
+    <a href="cable-table_3.html">🔌 Cable List</a>
+  </div>
+  <span class="src">GMI_BMS_Modbus_ATS_Wiring_20260826_EN.pptx</span>
+</div></div>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="kicker">Project-X · STT Bangkok · GMI Cloud</div>
+  <h1 data-i="h1"></h1>
+  <p class="sub" data-i="sub"></p>
+  <div class="mastfoot">
+    <span>DL-10 T/H: 70 pts</span><span>Diff. Pressure: 10 pts</span><span>Smoke: 16 pts</span>
+    <span>TOB Trip: 192 pts</span><span>Shutoff Valve: 96 pts</span>
+  </div>
+</header>
+
+<div class="alert" data-i="alert"></div>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#s1">DL-10 T/H — DH 6-1</a></li>
+    <li><a href="#s2">DL-10 T/H — DH 6-2</a></li>
+    <li><a href="#s3">Differential Pressure</a></li>
+    <li><a href="#s4">Smoke Detector</a></li>
+    <li><a href="#s5">TOB Trip Control</a></li>
+    <li><a href="#s6">Shutoff Valve Control</a></li>
+    <li><a href="#s7" data-i="toc7"></a></li>
+    <li><a href="#s8" data-i="toc8"></a></li>
+    <li><a href="#s9" data-i="toc9"></a></li>
+  </ol>
+</nav>
+
+<section id="s1">
+  <div class="shead">
+    <span class="snum">01 / SLIDE 3</span>
+    <h2>DL-10 Temperature / Humidity — Data Hall 6-1</h2>
+    <span class="chip c-lc">Liquid-Cooling 28</span><span class="chip c-it">IT Cabinet 14</span>
+  </div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>AWG22 Shielded 4C</dd></div>
+    <div><dt data-i="lbl_pattern"></dt><dd>3-1-3 <span data-i="v_perrow"></span></dd></div>
+    <div><dt data-i="lbl_mount"></dt><dd data-i="v_front"></dd></div>
+    <div><dt data-i="lbl_total"></dt><dd>42 pts</dd></div>
+  </dl>
+
+  <div class="scroll">
+  <table>
+    <caption>LIQUID-COOLING CABINETS · PANEL 06-BMS-PANEL-01-1 · CABINET c11</caption>
+    <thead><tr>
+      <th data-i="lbl_row"></th><th data-i="lbl_rack"></th><th data-i="lbl_pos"></th>
+      <th>GB300 ID</th><th>U</th><th data-i="lbl_qty"></th>
+    </tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="3"><span class="rowtag r-lc">F</span></td><td class="rack">f03</td><td>3</td><td class="mono">GB300-1-1</td><td class="u">U25, U26, U27</td><td>3</td></tr>
+      <tr><td class="rack">f07</td><td>7</td><td class="mono">GB300-1-5</td><td class="u">U24</td><td>1</td></tr>
+      <tr><td class="rack">f10</td><td>10</td><td class="mono">GB300-1-8</td><td class="u">U21, U22, U23</td><td>3</td></tr>
+
+      <tr class="band"><td rowspan="3"><span class="rowtag r-lc">E</span></td><td class="rack">e03</td><td>3</td><td class="mono">GB300-1-9</td><td class="u">U32, U33, U34</td><td>3</td></tr>
+      <tr><td class="rack">e07</td><td>7</td><td class="mono">GB300-1-13</td><td class="u">U31</td><td>1</td></tr>
+      <tr><td class="rack">e10</td><td>10</td><td class="mono">GB300-1-16</td><td class="u">U28, U29, U30</td><td>3</td></tr>
+
+      <tr class="band"><td rowspan="3"><span class="rowtag r-lc">B</span></td><td class="rack">b12</td><td>3</td><td class="mono">GB300-2-1</td><td class="u">U39, U40, U41</td><td>3</td></tr>
+      <tr><td class="rack">b08</td><td>7</td><td class="mono">GB300-2-5</td><td class="u">U38</td><td>1</td></tr>
+      <tr><td class="rack">b05</td><td>10</td><td class="mono">GB300-2-8</td><td class="u">U35, U36, U37</td><td>3</td></tr>
+
+      <tr class="band"><td rowspan="3"><span class="rowtag r-lc">A</span></td><td class="rack">a12</td><td>3</td><td class="mono">GB300-2-9</td><td class="u">U46, U47, U48</td><td>3</td></tr>
+      <tr><td class="rack">a08</td><td>7</td><td class="mono">GB300-2-13</td><td class="u">U45</td><td>1</td></tr>
+      <tr><td class="rack">a05</td><td>10</td><td class="mono">GB300-2-16</td><td class="u">U42, U43, U44</td><td>3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="scroll">
+  <table>
+    <caption>IT / NETWORK CABINETS · PANEL 06-BMS-PANEL-01-2 · CABINET c11</caption>
+    <thead><tr>
+      <th data-i="lbl_row"></th><th data-i="lbl_rack"></th><th data-i="lbl_pos"></th><th>U</th><th data-i="lbl_qty"></th>
+    </tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="3"><span class="rowtag r-it">D</span></td><td class="rack">d01</td><td>1</td><td class="u">U33, U34, U35</td><td>3</td></tr>
+      <tr><td class="rack">d05</td><td>5</td><td class="u">U36</td><td>1</td></tr>
+      <tr><td class="rack">d10</td><td>10</td><td class="u">U37, U38, U39</td><td>3</td></tr>
+      <tr class="band"><td rowspan="3"><span class="rowtag r-it">C</span></td><td class="rack">c01</td><td>1</td><td class="u">U40, U41, U42</td><td>3</td></tr>
+      <tr><td class="rack">c05</td><td>5</td><td class="u">U43</td><td>1</td></tr>
+      <tr><td class="rack">c09</td><td>9</td><td class="u">U44, U45, U46</td><td>3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <ul class="note-list"><li data-i="n1_1"></li><li data-i="n1_2"></li><li data-i="n1_3"></li></ul>
+</section>
+
+<section id="s2">
+  <div class="shead">
+    <span class="snum">02 / SLIDE 4</span>
+    <h2>DL-10 Temperature / Humidity — Data Hall 6-2</h2>
+    <span class="chip c-lc">Liquid-Cooling 14</span><span class="chip c-it">IT Cabinet 14</span>
+  </div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>AWG22 Shielded 4C</dd></div>
+    <div><dt data-i="lbl_pattern"></dt><dd>3-1-3 <span data-i="v_perrow"></span></dd></div>
+    <div><dt data-i="lbl_mount"></dt><dd data-i="v_front"></dd></div>
+    <div><dt data-i="lbl_total"></dt><dd>28 pts</dd></div>
+  </dl>
+
+  <div class="scroll">
+  <table>
+    <caption>DH 6-2 · ALL DL-10 POINTS · CABINET c06 / d06</caption>
+    <thead><tr>
+      <th data-i="lbl_type"></th><th data-i="lbl_row"></th><th data-i="lbl_rack"></th>
+      <th>GB300 ID</th><th>U</th><th data-i="lbl_qty"></th><th data-i="lbl_panel"></th>
+    </tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="6"><span class="chip c-lc">Liquid-Cooling</span></td>
+          <td rowspan="3"><span class="rowtag r-lc">B</span></td><td class="rack">b05</td><td class="mono">GB300-3-1</td><td class="u">U25, U26, U27</td><td>3</td><td rowspan="6" class="mono">06-BMS-<br>PANEL-02-1</td></tr>
+      <tr><td class="rack">b09</td><td class="mono">GB300-3-5</td><td class="u">U24</td><td>1</td></tr>
+      <tr><td class="rack">b12</td><td class="mono">GB300-3-8</td><td class="u">U21, U22, U23</td><td>3</td></tr>
+      <tr><td rowspan="3"><span class="rowtag r-lc">A</span></td><td class="rack">a05</td><td class="mono">GB300-3-9</td><td class="u">U32, U33, U34</td><td>3</td></tr>
+      <tr><td class="rack">a09</td><td class="mono">GB300-3-13</td><td class="u">U31</td><td>1</td></tr>
+      <tr><td class="rack">a12</td><td class="mono">GB300-3-16</td><td class="u">U28, U29, U30</td><td>3</td></tr>
+
+      <tr class="band"><td rowspan="6"><span class="chip c-it">IT Cabinet</span></td>
+          <td rowspan="3"><span class="rowtag r-it">D</span></td><td class="rack">d01</td><td class="mono">—</td><td class="u">U25, U26, U27</td><td>3</td><td rowspan="6" class="mono">06-BMS-<br>PANEL-02-2</td></tr>
+      <tr><td class="rack">d03</td><td class="mono">—</td><td class="u">U24</td><td>1</td></tr>
+      <tr><td class="rack">d05</td><td class="mono">—</td><td class="u">U21, U22, U23</td><td>3</td></tr>
+      <tr><td rowspan="3"><span class="rowtag r-it">C</span></td><td class="rack">c01</td><td class="mono">—</td><td class="u">U32, U33, U34</td><td>3</td></tr>
+      <tr><td class="rack">c03</td><td class="mono">—</td><td class="u">U31</td><td>1</td></tr>
+      <tr><td class="rack">c05</td><td class="mono">—</td><td class="u">U28, U29, U30</td><td>3</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <ul class="note-list"><li data-i="n2_1"></li><li data-i="n2_2"></li><li data-i="n2_3"></li></ul>
+</section>
+
+<section id="s3">
+  <div class="shead">
+    <span class="snum">03 / SLIDES 5–6</span>
+    <h2>Hot / Cold Aisle Differential Pressure (TDP)</h2>
+    <span class="chip c-dp">10 pts</span>
+  </div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>AWG22 Shielded 4C</dd></div>
+    <div><dt data-i="lbl_mount"></dt><dd data-i="v_aisle1"></dd></div>
+    <div><dt>6-1</dt><dd>2 × 3 POD = 6</dd></div>
+    <div><dt>6-2</dt><dd>2 × 2 POD = 4</dd></div>
+  </dl>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Data Hall</th><th>POD</th><th data-i="lbl_rowmeas"></th><th>ID</th><th data-i="lbl_position"></th><th data-i="lbl_panel"></th></tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="6">6-1</td><td rowspan="2">POD 1</td><td>F</td><td class="u">31</td><td data-i="v_lower"></td><td rowspan="6" class="mono">06-BMS-PANEL-01-1</td></tr>
+      <tr><td>E</td><td class="u">32</td><td data-i="v_upper"></td></tr>
+      <tr><td rowspan="2">POD <span data-i="v_mid"></span></td><td>D</td><td class="u">33</td><td data-i="v_lower"></td></tr>
+      <tr><td>C</td><td class="u">34</td><td data-i="v_upper"></td></tr>
+      <tr><td rowspan="2">POD 2</td><td>B</td><td class="u">35</td><td data-i="v_lower"></td></tr>
+      <tr><td>A</td><td class="u">36</td><td data-i="v_upper"></td></tr>
+      <tr class="band"><td rowspan="4">6-2</td><td rowspan="2">POD <span data-i="v_mid"></span></td><td>D</td><td class="u">31</td><td data-i="v_lower"></td><td rowspan="4" class="mono">06-BMS-PANEL-02-2</td></tr>
+      <tr><td>C</td><td class="u">32</td><td data-i="v_upper"></td></tr>
+      <tr><td rowspan="2">POD 3</td><td>B</td><td class="u">33</td><td data-i="v_lower"></td></tr>
+      <tr><td>A</td><td class="u">34</td><td data-i="v_upper"></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="note-list"><li data-i="n3_1"></li><li data-i="n3_2"></li></ul>
+</section>
+
+<section id="s4">
+  <div class="shead">
+    <span class="snum">04 / SLIDES 7–8</span>
+    <h2>Smoke Detector — JIC-636 (Hot Aisle)</h2>
+    <span class="chip c-sd">16 pts</span>
+  </div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>AWG22 Shielded 4C</dd></div>
+    <div><dt data-i="lbl_mount"></dt><dd data-i="v_overhead"></dd></div>
+    <div><dt>Terminals</dt><dd>12+ · 12− · COM · N/C</dd></div>
+    <div><dt>6-1 / 6-2</dt><dd>10 / 6</dd></div>
+  </dl>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Data Hall</th><th data-i="lbl_hotaisle"></th><th data-i="lbl_idlow"></th><th data-i="lbl_idup"></th><th data-i="lbl_panel"></th></tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="5">6-1</td><td>F</td><td class="u">1</td><td class="u">2</td><td rowspan="5" class="mono">06-BMS-PANEL-01-2</td></tr>
+      <tr><td>E</td><td class="u">3</td><td class="u">4</td></tr>
+      <tr><td>D–C <span data-i="v_middle"></span></td><td class="u">5</td><td class="u">6</td></tr>
+      <tr><td>B</td><td class="u">7</td><td class="u">8</td></tr>
+      <tr><td>A</td><td class="u">9</td><td class="u">10</td></tr>
+      <tr class="band"><td rowspan="3">6-2</td><td>D–C <span data-i="v_middle"></span></td><td class="u">1</td><td class="u">2</td><td rowspan="3" class="mono">06-BMS-PANEL-02-1</td></tr>
+      <tr><td>B</td><td class="u">3</td><td class="u">4</td></tr>
+      <tr><td>A</td><td class="u">5</td><td class="u">6</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="note-list"><li data-i="n4_1"></li><li data-i="n4_2"></li></ul>
+</section>
+
+<section id="s5">
+  <div class="shead">
+    <span class="snum">05 / SLIDES 9–10</span>
+    <h2>TOB Trip Control</h2>
+    <span class="chip c-tob">192 pts</span>
+  </div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>2.0 mm² 2C XLPE</dd></div>
+    <div><dt data-i="lbl_ppc"></dt><dd>4</dd></div>
+    <div><dt>6-1</dt><dd>4 × 8 × 4 = 128</dd></div>
+    <div><dt>6-2</dt><dd>4 × 8 × 2 = 64</dd></div>
+  </dl>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Data Hall</th><th data-i="lbl_row"></th><th data-i="lbl_range"></th><th>GB300 ID</th><th data-i="lbl_points"></th><th data-i="lbl_panel"></th></tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="4">6-1</td><td><span class="rowtag r-lc">F</span></td><td class="rack">f03 – f10</td><td class="mono">GB300-1-1 … 1-8</td><td>32</td><td class="mono">POD1 Busway I/O PANEL-1</td></tr>
+      <tr><td><span class="rowtag r-lc">E</span></td><td class="rack">e03 – e10</td><td class="mono">GB300-1-9 … 1-16</td><td>32</td><td class="mono">POD1 Busway I/O PANEL-2</td></tr>
+      <tr><td><span class="rowtag r-lc">B</span></td><td class="rack">b05 – b12</td><td class="mono">GB300-2-1 … 2-8</td><td>32</td><td class="mono">POD2 Busway I/O PANEL-1</td></tr>
+      <tr><td><span class="rowtag r-lc">A</span></td><td class="rack">a05 – a12</td><td class="mono">GB300-2-9 … 2-16</td><td>32</td><td class="mono">POD2 Busway I/O PANEL-2</td></tr>
+      <tr class="band"><td rowspan="2">6-2</td><td><span class="rowtag r-lc">B</span></td><td class="rack">b05 – b12</td><td class="mono">GB300-3-1 … 3-8</td><td>32</td><td class="mono">POD3 A Busway I/O PANEL-1</td></tr>
+      <tr><td><span class="rowtag r-lc">A</span></td><td class="rack">a05 – a12</td><td class="mono">GB300-3-9 … 3-16</td><td>32</td><td class="mono">POD3 B Busway I/O PANEL-1</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="note-list"><li data-i="n5_1"></li></ul>
+</section>
+
+<section id="s6">
+  <div class="shead"><span class="snum">06 / SLIDES 11–12</span><h2 data-i="s6h"></h2><span class="chip c-sv">96 pts</span></div>
+  <dl class="spec">
+    <div><dt data-i="lbl_cable"></dt><dd>AWG18 UL2586 Control 3C</dd></div>
+    <div><dt data-i="lbl_ppc"></dt><dd>2</dd></div>
+    <div><dt>6-1</dt><dd>2 × 8 × 4 = 64</dd></div>
+    <div><dt>6-2</dt><dd>2 × 8 × 2 = 32</dd></div>
+  </dl>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Data Hall</th><th data-i="lbl_row"></th><th data-i="lbl_range"></th><th data-i="lbl_points"></th><th data-i="lbl_panel"></th></tr></thead>
+    <tbody>
+      <tr class="band"><td rowspan="4">6-1</td><td><span class="rowtag r-lc">F</span></td><td class="rack">f03 – f10</td><td>16</td><td rowspan="2" class="mono">06-BMS-PANEL-01-5-3</td></tr>
+      <tr><td><span class="rowtag r-lc">E</span></td><td class="rack">e03 – e10</td><td>16</td></tr>
+      <tr><td><span class="rowtag r-lc">B</span></td><td class="rack">b05 – b12</td><td>16</td><td class="mono">06-BMS-PANEL-01-5-2</td></tr>
+      <tr><td><span class="rowtag r-lc">A</span></td><td class="rack">a05 – a12</td><td>16</td><td class="mono">06-BMS-PANEL-01-5-1</td></tr>
+      <tr class="band"><td rowspan="2">6-2</td><td><span class="rowtag r-lc">B</span></td><td class="rack">b05 – b12</td><td>16</td><td class="mono">06-BMS-PANEL-02-6-1</td></tr>
+      <tr><td><span class="rowtag r-lc">A</span></td><td class="rack">a05 – a12</td><td>16</td><td class="mono">06-BMS-PANEL-02-6-2</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="note-list"><li data-i="n6_1"></li></ul>
+</section>
+
+<section id="s7">
+  <div class="shead"><span class="snum">07 / SLIDE 1</span><h2 data-i="s7h"></h2></div>
+  <div class="scroll">
+  <table>
+    <caption>MTS AC220V · RED = L · BLUE = N · MTS PANEL AT THE LOWEST LEVEL</caption>
+    <thead><tr><th>ATS</th><th data-i="lbl_cabinet"></th><th data-i="lbl_panels_in"></th><th data-i="lbl_serves"></th></tr></thead>
+    <tbody>
+      <tr><td class="mono">ATS 6-1 C11</td><td class="rack">c11</td><td class="mono">06-BMS-PANEL-01-2 · POD2 Busway I/O PANEL-1 · POD2 Busway I/O PANEL-2 · 06-BMS-PANEL-01-1 (MTS)</td><td class="mono">DL-10 6-1, Diff. Pressure, Smoke, TOB Trip POD2</td></tr>
+      <tr><td class="mono">ATS 6-1 D11</td><td class="rack">d11</td><td class="mono">06-BMS-PANEL-01-5-2 · 06-BMS-PANEL-01-5-3 · POD1 Busway I/O PANEL-1 · POD1 Busway I/O PANEL-2 · 06-BMS-PANEL-01-5-1 (MTS)</td><td class="mono">Shutoff Valve 6-1, TOB Trip POD1</td></tr>
+      <tr><td class="mono">ATS 6-2 C06</td><td class="rack">c06</td><td class="mono">06-BMS-PANEL-02-2 · POD3 A Busway I/O PANEL-1 · 06-BMS-PANEL-02-1 (MTS)</td><td class="mono">DL-10 6-2, Diff. Pressure, Smoke, TOB Trip POD3-A</td></tr>
+      <tr><td class="mono">ATS 6-2 D06</td><td class="rack">d06</td><td class="mono">06-BMS-PANEL-02-6-2 · POD3 B Busway I/O PANEL-1 · 06-BMS-PANEL-02-6-1 (MTS)</td><td class="mono">Shutoff Valve 6-2, TOB Trip POD3-B</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="note-list"><li data-i="n7_1"></li><li data-i="n7_2"></li><li data-i="n7_3"></li></ul>
+</section>
+
+<section id="s8">
+  <div class="shead"><span class="snum">08 / SLIDES 14–18</span><h2 data-i="s8h"></h2></div>
+  <div class="check">
+    <label><input type="checkbox"><span data-i="c8_1"></span></label>
+    <label><input type="checkbox"><span data-i="c8_2"></span></label>
+    <label><input type="checkbox"><span data-i="c8_3"></span></label>
+    <label><input type="checkbox"><span data-i="c8_4"></span></label>
+    <label><input type="checkbox"><span data-i="c8_5"></span></label>
+    <label><input type="checkbox"><span data-i="c8_6"></span></label>
+    <label><input type="checkbox"><span data-i="c8_7"></span></label>
+  </div>
+  <h3 class="mini" data-i="s8sub"></h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th data-i="lbl_system"></th><th data-i="lbl_cable"></th><th data-i="lbl_cores"></th><th data-i="lbl_shield"></th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip c-lc">DL-10 T/H</span></td><td class="mono">AWG22</td><td>4C</td><td data-i="v_yes"></td></tr>
+      <tr><td><span class="chip c-dp">Diff. Pressure</span></td><td class="mono">AWG22</td><td>4C</td><td data-i="v_yes"></td></tr>
+      <tr><td><span class="chip c-sd">Smoke Detector</span></td><td class="mono">AWG22</td><td>4C</td><td data-i="v_yes"></td></tr>
+      <tr><td><span class="chip c-tob">TOB Trip</span></td><td class="mono">2.0 mm² XLPE</td><td>2C</td><td data-i="v_ns"></td></tr>
+      <tr><td><span class="chip c-sv">Shutoff Valve</span></td><td class="mono">AWG18 UL2586</td><td>3C</td><td data-i="v_ns"></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="shead"><span class="snum">09</span><h2 data-i="s9h"></h2></div>
+  <div class="check">
+    <label><input type="checkbox"><span data-i="c9_1"></span></label>
+    <label><input type="checkbox"><span data-i="c9_2"></span></label>
+    <label><input type="checkbox"><span data-i="c9_3"></span></label>
+    <label><input type="checkbox"><span data-i="c9_4"></span></label>
+    <label><input type="checkbox"><span data-i="c9_5"></span></label>
+    <label><input type="checkbox"><span data-i="c9_6"></span></label>
+    <label><input type="checkbox"><span data-i="c9_7"></span></label>
+  </div>
+</section>
+
+<footer data-i="foot"></footer>
+
+</div>
+
+<script>
+var I18N = {
+th:{
+ h1:"ตารางจุดติดตั้ง Sensor และการเดินสาย BMS",
+ sub:"Data Hall 6-1 และ 6-2 — ทุกจุดที่ปรากฏในสไลด์ 3–12 แยกตามตู้ Rack, ตำแหน่ง U, แถว, Panel ปลายทาง และชนิด/ขนาดสาย",
+ alert:"<b>ก่อนใช้งาน —</b> ตัวเลขในผังถูกตีความเป็นตำแหน่ง <b>U ในตู้ 48U</b> ตามที่ยืนยันมา แต่สไลด์ 3 และ 4 ตั้งชื่อว่า “Corresponding IDs” และมีโน้ต 0825 “Station IDs revised” ควรยืนยันกับผู้ออกแบบก่อนเจาะ/ยึดจริง เพราะเลขชุดฟ้า (21–48) กับชุดเขียว (33–46) ทับซ้อนกัน · <b>ชื่อตู้เปลี่ยนเป็น GB300</b> ตามที่แจ้ง (ในผังต้นฉบับพิมพ์ว่า GB200) · <b>c10 ไม่มีในผัง</b> คอลัมน์ C ข้ามจาก c11 ไป c09 · <b>สไลด์ 4 พิมพ์ผิด</b> <code>q05</code> ต้องเป็น <code>a05</code> — แก้ในตารางนี้แล้ว",
+ toc7:"ตำแหน่งตู้ Panel และแหล่งจ่ายไฟ", toc8:"วิธีต่อสายรวม", toc9:"รายการที่ต้องยืนยัน",
+ lbl_cable:"ชนิดสาย", lbl_pattern:"รูปแบบ", lbl_mount:"ติดที่", lbl_total:"รวม",
+ lbl_row:"แถว", lbl_rack:"ตู้", lbl_pos:"ลำดับตู้จากล่าง", lbl_qty:"จำนวน", lbl_type:"ประเภท",
+ lbl_panel:"Panel ปลายทาง", lbl_points:"จุด", lbl_range:"ช่วงตู้", lbl_ppc:"จุดต่อ 1 ตู้",
+ lbl_rowmeas:"แถวที่วัด", lbl_position:"ตำแหน่ง", lbl_idlow:"ID ปลายล่าง", lbl_idup:"ID ปลายบน",
+ lbl_hotaisle:"Hot Aisle ของแถว", lbl_system:"งาน", lbl_cores:"แกน", lbl_shield:"Shield",
+ lbl_cabinet:"ตู้", lbl_panels_in:"Panel ในตู้ (บน → ล่าง)", lbl_serves:"รับผิดชอบ",
+ v_front:"หน้าตู้ (FRONT)", v_perrow:"ต่อแถว", v_aisle1:"ในทางเดิน 1 ตัว/แถว",
+ v_overhead:"โครงเหนือหัวในทางเดินร้อน", v_lower:"ปลายล่างของทางเดิน", v_upper:"ปลายบนของทางเดิน",
+ v_mid:"กลาง", v_middle:"(กลาง)", v_yes:"มี", v_ns:"ไม่ระบุ",
+ s6h:"Shutoff Valve Control — ท่อแยกด้าน Secondary",
+ s7h:"ตำแหน่งตู้ Panel และแหล่งจ่ายไฟ (MTS / ATS)",
+ s8h:"วิธีต่อสายที่ใช้ร่วมกันทุกชนิด", s8sub:"สรุปชนิดสายตามงาน",
+ s9h:"รายการที่ต้องยืนยันก่อนลงมือ",
+ n1_1:"แถว F, E, D, C เลขตู้นับจาก<b>ล่างขึ้นบน</b> (f01 อยู่ล่างสุด) — แถว B, A นับ<b>บนลงล่าง</b> (b01/a01 อยู่บนสุด) แต่ตำแหน่งจริงบนพื้นเหมือนกันหมด คือตู้ที่ 3 / 7 / 10 นับจากล่าง",
+ n1_2:"แถว F, E มีตู้ f01–f14 / e01–e14 · แถว B, A มี b01–b14 / a01–a14 · คอลัมน์กลาง D, C มี d01–d11 / c01–c11 (c10 ไม่ปรากฏ)",
+ n1_3:"d11 และ c11 คือตู้ Panel/ATS (สีส้มในผัง) ไม่ใช่ตู้ IT",
+ n2_1:"DH 6-2 ใช้เลขซ้ำกัน 21–34 ทั้งชุดฟ้าและชุดเขียว เพราะอยู่คนละ Panel คนละ loop",
+ n2_2:"แถว B, A ของ 6-2 นับจาก<b>ล่างขึ้นบน</b> (b05 ต่ำสุด, b12 สูงสุด) — ต่างจาก B, A ของ 6-1",
+ n2_3:"คอลัมน์กลาง D, C ของ 6-2 สั้นกว่า ระยะเว้นเป็น 1 / 3 / 5 ไม่ใช่ 1 / 5 / 10",
+ n3_1:"ไม่มี U — ติดในทางเดิน ไม่ได้ติดบนตู้ โน้ต 0701 ระบุว่าจัดวางตามรูปซ้าย วิธีติดตั้งเหมือนที่ไต้หวัน",
+ n3_2:"สายวัดแรงดัน 2 เส้นต่อตัว เส้นหนึ่งเข้า Hot Aisle Containment อีกเส้นอยู่ Cold Aisle",
+ n4_1:"ไม่มี U — เลขนี้คือ Panel Equipment Number ตามชื่อสไลด์ ไม่ใช่ Station ID",
+ n4_2:"การต่อ: คู่ไฟเลี้ยง (12+ / 12−) รวมทุก 2 เส้นเข้า Y-terminal 1 ชุด · <b>NC และ COM ต่อแยกต่างหาก</b>",
+ n5_1:"ช่วง 8 ตู้ต่อแถวนี้คือตู้ GB300 ทั้งหมดในแถว — ตรงกับที่ DL-10 ลงที่ตู้ที่ 1, 5 และ 8 ของช่วงนี้พอดี",
+ n6_1:"การต่อ: <b>ไฟเลี้ยง 2 ชุดต้องแยกกัน</b> · จุดควบคุมรวมทุก 2 จุดเข้า terminal 1 ชุด",
+ n7_1:"ทุก Panel เป็น Custom 19-inch 4U Drawer ขนาด 403 × 600 × 175 mm พร้อม Perforated Panel",
+ n7_2:"MTS 4 โซนแยกอิสระจากกัน Panel ปลายทางจ่ายขนาน ไม่มี bus ร่วมข้ามโซน",
+ n7_3:"ตำแหน่ง U ของ Panel ในตู้ c11/d11/c06/d06 ยังไม่ระบุในเด็คนี้ บอกแค่ว่า MTS อยู่ล่างสุด",
+ c8_1:"ใช้ inline splice terminal (หรือชนิดหุ้มฉนวน) ที่จุดต่อสายทุกจุด",
+ c8_2:"ครอบ heat-shrink tubing ทับจุดต่อทุกจุด",
+ c8_3:"เดินสายกลับเข้า Panel ปลายทางตามตารางข้างบน",
+ c8_4:"รวมสายทุก 2 เส้นเข้า Y-terminal 1 ชุด แล้วยึดเข้า terminal block",
+ c8_5:"Smoke detector: NC และ COM ต่อแยกจากคู่ไฟเลี้ยง",
+ c8_6:"Shutoff valve: ไฟเลี้ยง 2 ชุดแยกกัน จุดควบคุมรวมทุก 2 จุดต่อ terminal 1 ชุด",
+ c8_7:"ปลาย Y-terminal ยึดที่ Double-Level Terminal Block TD-015 ในลิ้นชัก 4U",
+ c9_1:"ยืนยันว่าเลขในผัง = ตำแหน่ง U จริง (สไลด์ตั้งชื่อว่า “Corresponding IDs” + โน้ต 0825 “Station IDs revised”)",
+ c9_2:"c10 หายไปจากคอลัมน์ C ของ 6-1 — ตกหล่นหรือข้ามเลขจริง",
+ c9_3:"แจ้งแก้ typo <code>q05</code> → <code>a05</code> ในสไลด์ 4 และเปลี่ยน GB200 → GB300 ในผังต้นฉบับ",
+ c9_4:"DH 6-2 สลับ Panel เทียบกับ 6-1: Diff. Pressure ไป 02-2 แต่ Smoke ไป 02-1 (6-1 เป็น 01-1 / 01-2) — ตั้งใจหรือไม่",
+ c9_5:"ขอ Rack Elevation ของ DL-10 เพื่อยืนยันด้านติดตั้ง (FRONT) และระยะยึด",
+ c9_6:"ยืนยันตำแหน่ง U ของ Panel 4U ในตู้ c11 / d11 / c06 / d06",
+ c9_7:"Shutoff valve 6-1: Panel 01-5-3 รับ 2 แถว (F+E, 32 จุด) ส่วน 01-5-1/-2 รับแถวละ 16 จุด — ยืนยันโหลด",
+ foot:"อ้างอิง: 628985254291963909_GMI_BMS_Modbus_ATS_Wiring_20260826_EN.pptx (33 สไลด์) · สไลด์ 3–12 = ผังจุด · สไลด์ 14–18 = วิธีต่อสาย · สไลด์ 19–33 = BOM ของแต่ละ Panel"
+},
+zh:{
+ h1:"BMS 传感器点位与布线明细表",
+ sub:"Data Hall 6-1 与 6-2 — 第 3–12 页全部点位，按机柜、U 位、排、所属 Panel 及线缆规格拆分。",
+ alert:"<b>使用前请注意 —</b> 图中数字已按确认意见解读为 <b>48U 机柜内的 U 位</b>。但第 3、4 页标题为“Corresponding IDs”，且 0825 批注为“Station IDs revised”；蓝色系列（21–48）与绿色系列（33–46）存在重叠，正式开孔安装前请再向设计方确认。· <b>机柜型号已按通知改为 GB300</b>（原图标注为 GB200）。· <b>图中缺少 c10</b>，C 列由 c11 直接跳至 c09。· <b>第 4 页笔误</b> <code>q05</code> 应为 <code>a05</code>，本表已更正。",
+ toc7:"Panel 机柜位置与供电", toc8:"通用接线方法", toc9:"待确认事项",
+ lbl_cable:"线缆", lbl_pattern:"布点方式", lbl_mount:"安装位置", lbl_total:"合计",
+ lbl_row:"排", lbl_rack:"机柜", lbl_pos:"自下往上第几台", lbl_qty:"数量", lbl_type:"类型",
+ lbl_panel:"所属 Panel", lbl_points:"点数", lbl_range:"机柜范围", lbl_ppc:"每台机柜点数",
+ lbl_rowmeas:"测量排", lbl_position:"位置", lbl_idlow:"下端 ID", lbl_idup:"上端 ID",
+ lbl_hotaisle:"所属排热通道", lbl_system:"系统", lbl_cores:"芯数", lbl_shield:"屏蔽",
+ lbl_cabinet:"机柜", lbl_panels_in:"柜内 Panel（上 → 下）", lbl_serves:"服务范围",
+ v_front:"机柜正面（FRONT）", v_perrow:"每排", v_aisle1:"通道内，每排 1 只",
+ v_overhead:"热通道内上方结构", v_lower:"通道下端", v_upper:"通道上端",
+ v_mid:"中间", v_middle:"（中间）", v_yes:"有", v_ns:"未注明",
+ s6h:"Shutoff Valve Control — 二次侧机柜支管截止阀",
+ s7h:"Panel 机柜位置与供电（MTS / ATS）",
+ s8h:"各系统通用接线方法", s8sub:"各系统线缆规格汇总",
+ s9h:"施工前待确认事项",
+ n1_1:"F、E、D、C 排编号<b>自下而上</b>（f01 在最下）；B、A 排编号<b>自上而下</b>（b01/a01 在最上）。但实际地面位置一致，均为自下数第 3 / 7 / 10 台。",
+ n1_2:"F、E 排为 f01–f14 / e01–e14；B、A 排为 b01–b14 / a01–a14；中间 D、C 列为 d01–d11 / c01–c11（图中无 c10）。",
+ n1_3:"d11 与 c11 为 Panel/ATS 机柜（图中橙色），非 IT 机柜。",
+ n2_1:"DH 6-2 蓝色与绿色两套均使用 21–34，因分属不同 Panel、不同回路。",
+ n2_2:"6-2 的 B、A 排编号<b>自下而上</b>（b05 最低、b12 最高），与 6-1 的 B、A 相反。",
+ n2_3:"6-2 中间 D、C 列较短，间隔为 1 / 3 / 5，而非 1 / 5 / 10。",
+ n3_1:"无 U 位 — 安装于通道内而非机柜上。0701 批注：按左图布置，安装方式同台湾。",
+ n3_2:"每只 2 根取压管，一根进入热通道封闭，另一根位于冷通道。",
+ n4_1:"无 U 位 — 该编号为页面标题所称的 Panel Equipment Number，非 Station ID。",
+ n4_2:"接线：电源对（12+ / 12−）每两根合并至 1 组 Y 型端子；<b>NC 与 COM 单独接线</b>。",
+ n5_1:"每排 8 台的范围即该排全部 GB300 机柜 — 与 DL-10 落在该范围第 1、5、8 台完全吻合。",
+ n6_1:"接线：<b>两路电源必须分开</b>；控制点每两点合并至 1 组端子。",
+ n7_1:"所有 Panel 均为定制 19 英寸 4U 抽屉，403 × 600 × 175 mm，配冲孔面板。",
+ n7_2:"四个 MTS 区域相互独立，下游 Panel 并联供电，跨区无共用母线。",
+ n7_3:"c11/d11/c06/d06 柜内各 Panel 的 U 位本册未标注，仅说明 MTS 位于最下层。",
+ c8_1:"所有接头使用对接端子（或绝缘对接端子）。",
+ c8_2:"所有接头加装热缩管。",
+ c8_3:"按上表将线缆引回对应 Panel。",
+ c8_4:"每两根线合并至 1 组 Y 型端子，再固定至端子排。",
+ c8_5:"烟感：NC 与 COM 与电源对分开接线。",
+ c8_6:"截止阀：两路电源分开；控制点每两点接 1 组端子。",
+ c8_7:"Y 型端子固定于 4U 抽屉内的双层端子排 TD-015。",
+ c9_1:"确认图中数字确为 U 位（页面标题为“Corresponding IDs”，且有 0825 批注“Station IDs revised”）。",
+ c9_2:"6-1 的 C 列缺少 c10 — 属遗漏还是编号本身跳号？",
+ c9_3:"反馈第 4 页 <code>q05</code> → <code>a05</code> 笔误，并将原图 GB200 更正为 GB300。",
+ c9_4:"DH 6-2 与 6-1 的 Panel 对调：差压接 02-2、烟感接 02-1（6-1 为 01-1 / 01-2）— 是否为有意设计？",
+ c9_5:"索取 DL-10 机柜立面图，确认安装面（FRONT）及固定尺寸。",
+ c9_6:"确认 c11 / d11 / c06 / d06 柜内 4U Panel 的 U 位。",
+ c9_7:"6-1 截止阀：Panel 01-5-3 承担两排（F+E，32 点），01-5-1/-2 各 16 点 — 请确认负荷分配。",
+ foot:"来源：628985254291963909_GMI_BMS_Modbus_ATS_Wiring_20260826_EN.pptx（共 33 页）· 第 3–12 页为点位图 · 第 14–18 页为接线方法 · 第 19–33 页为各 Panel BOM。"
+},
+en:{
+ h1:"BMS Sensor Point &amp; Wiring Schedule",
+ sub:"Data Hall 6-1 and 6-2 — every point on slides 3–12, broken out by rack, U position, row, destination panel, and cable type/size.",
+ alert:"<b>Before use —</b> The plan numbers are read as <b>U positions in a 48U rack</b>, as confirmed. Slides 3 and 4 are titled “Corresponding IDs” and carry note 0825 “Station IDs revised”, and the blue series (21–48) overlaps the green series (33–46) — re-confirm with the designer before drilling or mounting. · <b>Cabinet type set to GB300</b> as advised (the source drawing prints GB200). · <b>c10 is absent</b> — column C jumps from c11 to c09. · <b>Slide 4 typo</b>: <code>q05</code> should be <code>a05</code> — corrected here.",
+ toc7:"Panel cabinets &amp; power", toc8:"Common termination method", toc9:"Open items",
+ lbl_cable:"Cable", lbl_pattern:"Pattern", lbl_mount:"Mounting", lbl_total:"Total",
+ lbl_row:"Row", lbl_rack:"Rack", lbl_pos:"Position from bottom", lbl_qty:"Qty", lbl_type:"Type",
+ lbl_panel:"Destination panel", lbl_points:"Points", lbl_range:"Cabinet range", lbl_ppc:"Points per cabinet",
+ lbl_rowmeas:"Row measured", lbl_position:"Position", lbl_idlow:"ID lower end", lbl_idup:"ID upper end",
+ lbl_hotaisle:"Hot aisle of row", lbl_system:"System", lbl_cores:"Cores", lbl_shield:"Shield",
+ lbl_cabinet:"Cabinet", lbl_panels_in:"Panels in cabinet (top → bottom)", lbl_serves:"Serves",
+ v_front:"Cabinet front (FRONT)", v_perrow:"per row", v_aisle1:"In aisle, 1 per row",
+ v_overhead:"Overhead structure, hot aisle", v_lower:"Lower end of aisle", v_upper:"Upper end of aisle",
+ v_mid:"mid", v_middle:"(middle)", v_yes:"Yes", v_ns:"Not stated",
+ s6h:"Shutoff Valve Control — secondary-side branch pipe",
+ s7h:"Panel cabinets and power source (MTS / ATS)",
+ s8h:"Common termination method", s8sub:"Cable type by system",
+ s9h:"Open items to confirm before installation",
+ n1_1:"Rows F, E, D, C are numbered <b>bottom→top</b> (f01 lowest). Rows B and A are numbered <b>top→bottom</b> (b01/a01 highest), but the physical positions are identical: 3rd / 7th / 10th cabinet from the bottom.",
+ n1_2:"Rows F, E hold f01–f14 / e01–e14. Rows B, A hold b01–b14 / a01–a14. Middle columns D, C hold d01–d11 / c01–c11 (c10 not shown).",
+ n1_3:"d11 and c11 are the panel/ATS cabinets (orange in the plan), not IT cabinets.",
+ n2_1:"DH 6-2 reuses 21–34 for both the blue and green sets because they sit on different panels and different loops.",
+ n2_2:"In 6-2, rows B and A count <b>bottom→top</b> (b05 lowest, b12 highest) — the opposite of 6-1's B and A.",
+ n2_3:"The 6-2 middle columns D and C are shorter — spacing is 1 / 3 / 5, not 1 / 5 / 10.",
+ n3_1:"No U — mounted in the aisle, not on a cabinet. Note 0701: arrange as shown at left; installation method the same as in Taiwan.",
+ n3_2:"Two sensing tubes per unit — one inside the hot aisle containment, one in the cold aisle.",
+ n4_1:"No U — these are panel equipment numbers per the slide title, not station IDs.",
+ n4_2:"Wiring: pair the power leads (12+ / 12−), two wires to one Y-terminal set. <b>NC and COM are terminated separately.</b>",
+ n5_1:"The 8-cabinet range per row is exactly that row's GB300 cabinets — matching the DL-10 points, which land on the 1st, 5th and 8th cabinet of the range.",
+ n6_1:"Wiring: <b>keep the two power feeds separate</b>; group every two control points to one terminal set.",
+ n7_1:"Every panel is a custom 19-inch 4U drawer, 403 × 600 × 175 mm, with a perforated panel.",
+ n7_2:"The four MTS zones are independent; downstream panels are supplied in parallel with no shared bus across zones.",
+ n7_3:"The U positions of the panels inside c11/d11/c06/d06 are not given in this deck — only that the MTS sits at the lowest level.",
+ c8_1:"Use an inline splice terminal (or the insulated type) at every joint.",
+ c8_2:"Cover every joint with heat-shrink tubing.",
+ c8_3:"Route the run back to the destination panel listed above.",
+ c8_4:"Group every two wires to one Y-terminal set, then secure to the terminal block.",
+ c8_5:"Smoke detector: terminate NC and COM separately from the power pair.",
+ c8_6:"Shutoff valve: keep the two power feeds separate; two control points per terminal set.",
+ c8_7:"Land the Y-terminals on the TD-015 double-level terminal block in the 4U drawer.",
+ c9_1:"Confirm the plan numbers really are U positions (slides titled “Corresponding IDs”, note 0825 “Station IDs revised”).",
+ c9_2:"c10 is missing from column C in 6-1 — omission, or a genuine skip in the numbering?",
+ c9_3:"Report the <code>q05</code> → <code>a05</code> typo on slide 4, and update GB200 → GB300 on the source drawing.",
+ c9_4:"DH 6-2 swaps panels relative to 6-1: differential pressure → 02-2, smoke → 02-1 (6-1 uses 01-1 / 01-2). Intentional?",
+ c9_5:"Request the DL-10 rack elevation to confirm the mounting face (FRONT) and fixing offsets.",
+ c9_6:"Confirm the U positions of the 4U panels inside c11 / d11 / c06 / d06.",
+ c9_7:"Shutoff valve 6-1: panel 01-5-3 takes two rows (F+E, 32 points) while 01-5-1/-2 take 16 each — confirm the loading.",
+ foot:"Source: 628985254291963909_GMI_BMS_Modbus_ATS_Wiring_20260826_EN.pptx (33 slides) · Slides 3–12 point layouts · Slides 14–18 wiring method · Slides 19–33 per-panel BOM."
+},
+my:{
+ h1:"BMS အာရုံခံကိရိယာ တပ်ဆင်နေရာနှင့် ဝါယာကြိုးဇယား",
+ sub:"Data Hall 6-1 နှင့် 6-2 — စလိုက် ၃ မှ ၁၂ အထိ အမှတ်အားလုံးကို ကက်ဘိနက်၊ U နေရာ၊ အတန်း၊ ဆက်သွယ်ရမည့် Panel နှင့် ဝါယာကြိုးအမျိုးအစားအလိုက် ခွဲထားသည်။",
+ alert:"<b>အသုံးမပြုမီ —</b> ပုံစံအတွင်းရှိ ဂဏန်းများကို အတည်ပြုချက်အရ <b>48U ကက်ဘိနက်အတွင်း U နေရာ</b> အဖြစ် ဖော်ပြထားသည်။ သို့သော် စလိုက် ၃ နှင့် ၄ ခေါင်းစဉ်တွင် “Corresponding IDs” ဟုပါရှိပြီး 0825 မှတ်ချက်တွင် “Station IDs revised” ဟုပါသည်။ အပြာရောင်စဉ် (21–48) နှင့် အစိမ်းရောင်စဉ် (33–46) ထပ်နေသဖြင့် တပ်ဆင်ခြင်းမပြုမီ ဒီဇိုင်နာနှင့် ထပ်မံအတည်ပြုပါ။ · <b>ကက်ဘိနက်အမည်ကို GB300 သို့ ပြောင်းထားသည်</b> (မူရင်းပုံတွင် GB200 ဟုရေးထားသည်)။ · <b>c10 ပါမလာပါ</b> — C ကော်လံသည် c11 မှ c09 သို့ ကျော်သွားသည်။ · <b>စလိုက် ၄ တွင် စာလုံးမှား</b> <code>q05</code> သည် <code>a05</code> ဖြစ်ရမည် — ဤဇယားတွင် ပြင်ပြီးဖြစ်သည်။",
+ toc7:"Panel ကက်ဘိနက်နေရာနှင့် လျှပ်စစ်ရင်းမြစ်", toc8:"ဘုံ ဝါယာဆက်သွယ်နည်း", toc9:"အတည်ပြုရန် ကျန်ရှိချက်များ",
+ lbl_cable:"ဝါယာကြိုး", lbl_pattern:"ပုံစံ", lbl_mount:"တပ်ဆင်ရာနေရာ", lbl_total:"စုစုပေါင်း",
+ lbl_row:"အတန်း", lbl_rack:"ကက်ဘိနက်", lbl_pos:"အောက်မှ အစဉ်လိုက်နေရာ", lbl_qty:"အရေအတွက်", lbl_type:"အမျိုးအစား",
+ lbl_panel:"ဆက်သွယ်ရမည့် Panel", lbl_points:"အမှတ်", lbl_range:"ကက်ဘိနက် အပိုင်းအခြား", lbl_ppc:"ကက်ဘိနက် ၁ လုံးလျှင် အမှတ်",
+ lbl_rowmeas:"တိုင်းတာသည့် အတန်း", lbl_position:"နေရာ", lbl_idlow:"အောက်စွန်း ID", lbl_idup:"အပေါ်စွန်း ID",
+ lbl_hotaisle:"အတန်း၏ အပူလမ်းကြား", lbl_system:"စနစ်", lbl_cores:"ကြိုးလုံး", lbl_shield:"ကာကွယ်လွှာ",
+ lbl_cabinet:"ကက်ဘိနက်", lbl_panels_in:"ကက်ဘိနက်အတွင်း Panel (အပေါ် → အောက်)", lbl_serves:"တာဝန်ယူသည့် အပိုင်း",
+ v_front:"ကက်ဘိနက် ရှေ့ဘက် (FRONT)", v_perrow:"တစ်တန်းလျှင်", v_aisle1:"လမ်းကြားအတွင်း၊ တစ်တန်းလျှင် ၁ လုံး",
+ v_overhead:"အပူလမ်းကြားအတွင်း အပေါ်ဘက် အဆောက်အအုံ", v_lower:"လမ်းကြား၏ အောက်ဘက်စွန်း", v_upper:"လမ်းကြား၏ အပေါ်ဘက်စွန်း",
+ v_mid:"အလယ်", v_middle:"(အလယ်)", v_yes:"ရှိသည်", v_ns:"မဖော်ပြထား",
+ s6h:"Shutoff Valve Control — Secondary ဘက် အခက်ပိုက်",
+ s7h:"Panel ကက်ဘိနက်နေရာနှင့် လျှပ်စစ်ရင်းမြစ် (MTS / ATS)",
+ s8h:"စနစ်အားလုံးအတွက် ဘုံ ဝါယာဆက်သွယ်နည်း", s8sub:"စနစ်အလိုက် ဝါယာကြိုးအမျိုးအစား",
+ s9h:"တပ်ဆင်ခြင်းမပြုမီ အတည်ပြုရန်",
+ n1_1:"F, E, D, C အတန်းများသည် <b>အောက်မှအပေါ်သို့</b> နံပါတ်စဉ်တပ်သည် (f01 အနိမ့်ဆုံး)။ B, A အတန်းများသည် <b>အပေါ်မှအောက်သို့</b> (b01/a01 အမြင့်ဆုံး)။ သို့သော် အမှန်တကယ်နေရာမှာ တူညီပြီး အောက်မှ ၃ / ၇ / ၁၀ ခုမြောက် ကက်ဘိနက်များ ဖြစ်သည်။",
+ n1_2:"F, E အတန်းတွင် f01–f14 / e01–e14 ရှိသည်။ B, A အတန်းတွင် b01–b14 / a01–a14 ရှိသည်။ အလယ် D, C ကော်လံတွင် d01–d11 / c01–c11 ရှိသည် (c10 မပါ)။",
+ n1_3:"d11 နှင့် c11 သည် Panel/ATS ကက်ဘိနက်များဖြစ်သည် (ပုံတွင် လိမ္မော်ရောင်)၊ IT ကက်ဘိနက် မဟုတ်ပါ။",
+ n2_1:"DH 6-2 တွင် အပြာနှင့် အစိမ်း နှစ်ခုစလုံး 21–34 ကို ပြန်သုံးသည်။ အကြောင်းမှာ Panel မတူ၊ loop မတူသောကြောင့် ဖြစ်သည်။",
+ n2_2:"6-2 ၏ B, A အတန်းများသည် <b>အောက်မှအပေါ်သို့</b> နံပါတ်စဉ်တပ်သည် (b05 အနိမ့်ဆုံး၊ b12 အမြင့်ဆုံး) — 6-1 ၏ B, A နှင့် ဆန့်ကျင်ဘက် ဖြစ်သည်။",
+ n2_3:"6-2 ၏ အလယ် D, C ကော်လံများ ပိုတိုသည်။ အကွာအဝေးမှာ 1 / 3 / 5 ဖြစ်ပြီး 1 / 5 / 10 မဟုတ်ပါ။",
+ n3_1:"U မရှိပါ — ကက်ဘိနက်ပေါ်တွင် မဟုတ်ဘဲ လမ်းကြားအတွင်း တပ်ဆင်သည်။ 0701 မှတ်ချက်: ဘယ်ဘက်ပုံအတိုင်း စီစဉ်ပါ၊ တပ်ဆင်နည်းမှာ ထိုင်ဝမ်နှင့် အတူတူဖြစ်သည်။",
+ n3_2:"တစ်လုံးလျှင် ဖိအားတိုင်းပိုက် ၂ ချောင်း — တစ်ချောင်းသည် အပူလမ်းကြားအတွင်း၊ နောက်တစ်ချောင်းသည် အအေးလမ်းကြားတွင် ရှိသည်။",
+ n4_1:"U မရှိပါ — ဤနံပါတ်များသည် စလိုက်ခေါင်းစဉ်အရ Panel Equipment Number ဖြစ်ပြီး Station ID မဟုတ်ပါ။",
+ n4_2:"ဝါယာဆက်သွယ်ခြင်း: ပါဝါကြိုးအတွဲ (12+ / 12−) ကို နှစ်ချောင်းလျှင် Y-terminal ၁ စုံသို့ စုပေါင်းပါ။ <b>NC နှင့် COM ကို သီးခြားဆက်ရမည်။</b>",
+ n5_1:"တစ်တန်းလျှင် ကက်ဘိနက် ၈ လုံး၏ အပိုင်းအခြားသည် ထိုအတန်း၏ GB300 ကက်ဘိနက်အားလုံး ဖြစ်သည် — DL-10 အမှတ်များ ထိုအပိုင်း၏ ၁၊ ၅ နှင့် ၈ ခုမြောက်တွင် ကျရောက်သည်နှင့် ကိုက်ညီသည်။",
+ n6_1:"ဝါယာဆက်သွယ်ခြင်း: <b>ပါဝါ ၂ လိုင်းကို သီးခြားထားရမည်။</b> ထိန်းချုပ်အမှတ်များကို နှစ်ခုလျှင် terminal ၁ စုံသို့ စုပေါင်းပါ။",
+ n7_1:"Panel အားလုံးသည် စိတ်ကြိုက် ၁၉ လက်မ 4U အံဆွဲ (403 × 600 × 175 မီလီမီတာ) ဖြစ်ပြီး အပေါက်ဖောက်ပြား ပါဝင်သည်။",
+ n7_2:"MTS ဇုန် ၄ ခုသည် သီးခြားစီ ဖြစ်သည်။ အောက်ပိုင်း Panel များကို အပြိုင်ဖြန့်ဝေပြီး ဇုန်ချင်း မျှဝေသည့် bus မရှိပါ။",
+ n7_3:"c11/d11/c06/d06 အတွင်းရှိ Panel များ၏ U နေရာကို ဤစာတမ်းတွင် မဖော်ပြထားပါ — MTS သည် အောက်ဆုံးတွင် ရှိသည်ဟုသာ ဆိုထားသည်။",
+ c8_1:"ဆက်သွယ်မှုနေရာတိုင်းတွင် inline splice terminal (သို့မဟုတ် လျှပ်ကာအမျိုးအစား) သုံးပါ။",
+ c8_2:"ဆက်သွယ်မှုနေရာတိုင်းကို heat-shrink tubing ဖြင့် ဖုံးအုပ်ပါ။",
+ c8_3:"အထက်ဇယားပါ ဆက်သွယ်ရမည့် Panel သို့ ကြိုးကို ပြန်လည်သွယ်တန်းပါ။",
+ c8_4:"ကြိုးနှစ်ချောင်းလျှင် Y-terminal ၁ စုံသို့ စုပေါင်းပြီး terminal block တွင် တပ်ဆင်ပါ။",
+ c8_5:"မီးခိုးအာရုံခံ: NC နှင့် COM ကို ပါဝါအတွဲမှ သီးခြားဆက်ပါ။",
+ c8_6:"Shutoff valve: ပါဝါ ၂ လိုင်း သီးခြားထားပါ။ ထိန်းချုပ်အမှတ် နှစ်ခုလျှင် terminal ၁ စုံ။",
+ c8_7:"Y-terminal များကို 4U အံဆွဲအတွင်းရှိ TD-015 နှစ်ထပ် terminal block တွင် တပ်ဆင်ပါ။",
+ c9_1:"ပုံစံပါ ဂဏန်းများသည် U နေရာ အမှန်ဖြစ်ကြောင်း အတည်ပြုပါ (ခေါင်းစဉ် “Corresponding IDs”၊ မှတ်ချက် 0825 “Station IDs revised”)။",
+ c9_2:"6-1 ၏ C ကော်လံတွင် c10 ပျောက်နေသည် — ကျန်ခဲ့ခြင်းလား၊ နံပါတ်စဉ် ကျော်ခြင်းလား။",
+ c9_3:"စလိုက် ၄ ရှိ <code>q05</code> → <code>a05</code> စာလုံးမှားကို အကြောင်းကြားပြီး မူရင်းပုံတွင် GB200 → GB300 ပြင်ရန်။",
+ c9_4:"DH 6-2 သည် 6-1 နှင့် Panel လဲထားသည်: ဖိအားကွာခြားမှု → 02-2၊ မီးခိုး → 02-1 (6-1 တွင် 01-1 / 01-2)။ ရည်ရွယ်ချက် ရှိပါသလား။",
+ c9_5:"တပ်ဆင်မည့်မျက်နှာ (FRONT) နှင့် အကွာအဝေးများ အတည်ပြုရန် DL-10 ၏ Rack Elevation ကို တောင်းဆိုပါ။",
+ c9_6:"c11 / d11 / c06 / d06 အတွင်းရှိ 4U Panel များ၏ U နေရာကို အတည်ပြုပါ။",
+ c9_7:"6-1 Shutoff valve: Panel 01-5-3 သည် အတန်း ၂ တန်း (F+E၊ ၃၂ အမှတ်) ကို တာဝန်ယူပြီး 01-5-1/-2 က တစ်ခုလျှင် ၁၆ အမှတ်စီ — ဝန်အား အတည်ပြုပါ။",
+ foot:"အရင်းအမြစ်: 628985254291963909_GMI_BMS_Modbus_ATS_Wiring_20260826_EN.pptx (စလိုက် ၃၃ ခု) · စလိုက် ၃–၁၂ အမှတ်ပြပုံ · စလိုက် ၁၄–၁၈ ဝါယာဆက်နည်း · စလိုက် ၁၉–၃၃ Panel အလိုက် BOM။"
+}
+};
+
+function applyLang(code){
+  var dict = I18N[code] || I18N.en;
+  document.documentElement.setAttribute('data-lang', code);
+  document.documentElement.setAttribute('lang', code === 'zh' ? 'zh-Hans' : code);
+  var nodes = document.querySelectorAll('[data-i]');
+  for (var i=0;i<nodes.length;i++){
+    var v = dict[nodes[i].getAttribute('data-i')];
+    if (v !== undefined) nodes[i].innerHTML = v;
+  }
+  var btns = document.querySelectorAll('button.lang');
+  for (var j=0;j<btns.length;j++){
+    btns[j].setAttribute('aria-pressed', btns[j].getAttribute('data-set') === code ? 'true' : 'false');
+  }
+}
+var lbtns = document.querySelectorAll('button.lang');
+for (var k=0;k<lbtns.length;k++){
+  lbtns[k].addEventListener('click', function(e){ applyLang(e.currentTarget.getAttribute('data-set')); });
+}
+applyLang('th');
+</script>
+</body>
+</html>
