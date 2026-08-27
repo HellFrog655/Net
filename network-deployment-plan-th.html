@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตรวจนับอุปกรณ์และลำดับการติดตั้งเครือข่าย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1ef;
+    --card:#fbfcfb;
+    --ink:#141a1f;
+    --graphite:#5d6a71;
+    --rule:#ccd4d2;
+    --rule-soft:#e0e6e3;
+    --oob:#c2601a;
+    --inband:#15579c;
+    --ib:#0f7355;
+    --crit:#a81d38;
+    --spare:#6b7780;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --body:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif;
+    --display:"Bai Jamjuree","IBM Plex Sans Thai",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--body);font-size:16px;line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    border-bottom:1px solid var(--rule);
+    background:
+      repeating-linear-gradient(90deg,transparent 0 39px,rgba(20,26,31,.05) 39px 40px),
+      var(--card);
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .masthead .wrap{padding-top:56px;padding-bottom:0}
+  .eyebrow{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--graphite);margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--display);font-weight:700;font-size:clamp(32px,5.2vw,52px);
+    line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;max-width:18ch;
+  }
+  .standfirst{max-width:62ch;color:#2c353b;margin:0 0 26px;font-size:17px}
+  .metaline{
+    display:flex;flex-wrap:wrap;gap:6px 22px;font-family:var(--mono);font-size:12px;
+    color:var(--graphite);border-top:1px solid var(--rule-soft);padding:14px 0 34px;
+  }
+
+  /* ---------- hero: three delivery gates ---------- */
+  .gates{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--ink)}
+  .gate{
+    padding:22px 22px 30px;border-right:1px solid var(--rule);position:relative;
+    background:linear-gradient(180deg,rgba(0,0,0,.02),transparent 70%);
+  }
+  .gate:last-child{border-right:0}
+  .gate::before{content:"";position:absolute;top:-2px;left:0;width:100%;height:4px;background:var(--tier)}
+  .gate .date{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.4vw,34px);line-height:1.1;color:var(--tier)}
+  .gate .what{font-weight:600;margin-top:6px}
+  .gate .who{font-family:var(--mono);font-size:11.5px;color:var(--graphite);margin-top:4px}
+  .g1{--tier:var(--oob)} .g2{--tier:var(--inband)} .g3{--tier:var(--ib)}
+
+  /* ---------- shell ---------- */
+  .shell{max-width:1180px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:230px 1fr;gap:56px;align-items:start}
+  .rail{position:sticky;top:26px;padding:40px 0;font-size:13.5px}
+  .rail p{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--graphite);margin:0 0 12px}
+  .rail a{
+    display:block;color:#39444b;text-decoration:none;padding:5px 0 5px 12px;
+    border-left:2px solid var(--rule-soft);line-height:1.45;
+  }
+  .rail a:hover,.rail a:focus-visible{color:var(--ink);border-left-color:var(--ink);background:rgba(0,0,0,.03)}
+
+  main{padding:40px 0 90px;min-width:0}
+
+  /* ---------- sections ---------- */
+  .sec{margin:0 0 62px;scroll-margin-top:24px}
+  .sec-head{display:flex;gap:16px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:22px}
+  .num{font-family:var(--mono);font-size:12px;color:var(--graphite);padding-top:4px}
+  .sec h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,2.6vw,27px);margin:0;line-height:1.25;flex:1}
+  .chip{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 9px;border:1px solid var(--tier,var(--graphite));color:var(--tier,var(--graphite));white-space:nowrap;
+  }
+  .c-crit{--tier:var(--crit)} .c-oob{--tier:var(--oob)} .c-inband{--tier:var(--inband)}
+  .c-ib{--tier:var(--ib)} .c-spare{--tier:var(--spare)}
+
+  .sec p{margin:0 0 14px;max-width:72ch}
+  .lead{font-size:17px;color:#2c353b}
+
+  /* ---------- tables ---------- */
+  .tablewrap{overflow-x:auto;margin:0 0 20px;border:1px solid var(--rule);background:var(--card)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+  caption{
+    text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--graphite);padding:11px 14px;border-bottom:1px solid var(--rule-soft);
+  }
+  th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+  thead th{
+    font-family:var(--mono);font-weight:500;font-size:11.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--graphite);border-bottom:1px solid var(--rule);white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  .num-cell{font-family:var(--mono);white-space:nowrap}
+  tr.total td{font-weight:600;background:rgba(20,26,31,.045);border-top:1px solid var(--rule)}
+  .rowmark{border-left:3px solid var(--tier);}
+  .m-crit{--tier:var(--crit)} .m-oob{--tier:var(--oob)} .m-inband{--tier:var(--inband)}
+  .m-ib{--tier:var(--ib)} .m-spare{--tier:var(--spare)}
+  .sub th{font-family:var(--body);font-weight:600;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
+
+  /* ---------- lists ---------- */
+  ul,ol{margin:0 0 18px;padding-left:22px;max-width:72ch}
+  li{margin-bottom:6px}
+  li::marker{color:var(--graphite)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0}
+  ol.steps li{counter-increment:s;padding-left:38px;position:relative}
+  ol.steps li::before{
+    content:counter(s,decimal-leading-zero);position:absolute;left:0;top:0;
+    font-family:var(--mono);font-size:12px;color:var(--oob);
+  }
+  code,.host{font-family:var(--mono);font-size:13.5px;background:rgba(20,26,31,.06);padding:1px 6px;word-break:break-all}
+
+  /* ---------- callouts ---------- */
+  .note{
+    border-left:3px solid var(--tier,var(--ink));background:var(--card);
+    padding:14px 18px;margin:0 0 20px;
+  }
+  .note h4{
+    margin:0 0 6px;font-family:var(--mono);font-size:11px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--tier,var(--graphite));font-weight:500;
+  }
+  .note p:last-child,.note ul:last-child{margin-bottom:0}
+  .n-crit{--tier:var(--crit)} .n-oob{--tier:var(--oob)} .n-inband{--tier:var(--inband)} .n-ib{--tier:var(--ib)}
+
+  .flow{
+    font-family:var(--mono);font-size:13px;background:var(--card);border:1px solid var(--rule);
+    padding:13px 16px;margin:0 0 20px;overflow-x:auto;white-space:nowrap;
+  }
+  .flow span{color:var(--graphite);padding:0 6px}
+
+  /* ---------- zone cards ---------- */
+  .zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:22px}
+  .zone{background:var(--card);padding:18px}
+  .zone .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--tier);padding:2px 8px;margin-bottom:10px}
+  .zone p{font-size:14.5px;margin:0}
+  .z1{--tier:var(--crit)} .z2{--tier:var(--oob)} .z3{--tier:var(--spare)}
+
+  .pull{
+    border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);
+    padding:20px 0;margin:26px 0 0;font-family:var(--display);font-weight:500;
+    font-size:clamp(16px,2vw,19px);line-height:1.6;max-width:70ch;
+  }
+
+  footer{border-top:1px solid var(--rule);background:var(--card)}
+  footer .wrap{padding:26px 28px;font-family:var(--mono);font-size:11.5px;color:var(--graphite);display:flex;flex-wrap:wrap;gap:8px 24px}
+
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--inband);outline-offset:2px}
+
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr;gap:0}
+    .rail{position:static;padding:26px 0 0;border-bottom:1px solid var(--rule)}
+    .rail nav{display:flex;flex-wrap:wrap;gap:4px 0}
+    .rail a{border-left:0;border-top:2px solid var(--rule-soft);padding:5px 14px 5px 0;margin-right:14px}
+    .gates{grid-template-columns:1fr}
+    .gate{border-right:0;border-bottom:1px solid var(--rule)}
+    .masthead .wrap{padding-top:38px}
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .rail,.masthead .metaline{display:none}
+    .shell{display:block;max-width:none;padding:0}
+    .sec{page-break-inside:avoid;margin-bottom:26px}
+    .gates{border-top:2px solid #000}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">แผนติดตั้งและส่งมอบเครือข่าย · ฉบับแปลไทย</p>
+    <h1>ตรวจนับอุปกรณ์และลำดับการติดตั้ง</h1>
+    <p class="standfirst">อุปกรณ์ทั้งหมด 195 เครื่องจะทยอยถึงหน้างาน แต่จะไม่ติดตั้งแบบเฉลี่ยเท่ากันทุกรุ่น เอกสารนี้กำหนดว่าจะติดตั้งอะไรก่อน–หลัง เพื่อให้ทันกำหนดส่งมอบสามช่วงและปลดล็อกการดีบักระยะไกลให้เร็วที่สุด</p>
+    <div class="metaline">
+      <span>เอกสารต้นฉบับ: 20 ส.ค. 2026 17:34</span>
+      <span>อุปกรณ์รวม 195 เครื่อง</span>
+      <span>ใช้งานจริง 187 · สำรอง 8</span>
+      <span>วันอุปกรณ์ล็อตหลักถึง: 27 ส.ค.</span>
+    </div>
+    <div class="gates">
+      <div class="gate g1">
+        <div class="date">8 ก.ย.</div>
+        <div class="what">ส่งมอบเครือข่าย OOB</div>
+        <div class="who">SN2201 47 · SN4700 16 · SN5610 2</div>
+      </div>
+      <div class="gate g2">
+        <div class="date">20 ก.ย.</div>
+        <div class="what">ส่งมอบเครือข่ายบริการ (INBAND)</div>
+        <div class="who">SN5610 48 · SN4700 2</div>
+      </div>
+      <div class="gate g3">
+        <div class="date">7 ต.ค.</div>
+        <div class="what">ส่งมอบเครือข่าย InfiniBand</div>
+        <div class="who">QM3400 72 · UFM</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <p>สารบัญ</p>
+    <nav>
+      <a href="#s1">01 · ตรวจนับจำนวนอุปกรณ์</a>
+      <a href="#s2">02 · ลำดับความสำคัญ</a>
+      <a href="#s3">03 · เงื่อนไขดีบักระยะไกล</a>
+      <a href="#s4">04 · SN2201 ชุดแรก 11 เครื่อง</a>
+      <a href="#s5">05 · เครือข่าย OOB เต็มรูปแบบ</a>
+      <a href="#s6">06 · เครือข่ายบริการ</a>
+      <a href="#s7">07 · เครือข่ายความเร็วสูง</a>
+      <a href="#s8">08 · การจัดโซนวันที่ 27 ส.ค.</a>
+      <a href="#s9">09 · ตารางเวลาการทำงาน</a>
+      <a href="#s10">10 · ตู้ GPU และวงจรสื่อสาร</a>
+      <a href="#s11">11 · สเปกและผังพอร์ต OOB</a>
+      <a href="#s12">12 · จุดที่ต้องยืนยัน</a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- 1 -->
+    <section class="sec" id="s1">
+      <div class="sec-head"><span class="num">01</span><h2>ตรวจนับจำนวนอุปกรณ์</h2></div>
+      <div class="tablewrap">
+        <table>
+          <caption>สรุปจำนวนตามรุ่น</caption>
+          <thead>
+            <tr><th>รุ่น</th><th>ได้รับทั้งหมด</th><th>ใช้งานจริง</th><th>เครื่องสำรอง</th><th>วัตถุประสงค์</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num-cell">SN2201</td><td class="num-cell">49</td><td class="num-cell">47</td><td class="num-cell">2</td><td>11 เครื่องแรกใช้ปลดล็อกช่องทาง OOB ที่เหลือ 36 เครื่องต่อเข้าเครือข่าย OOB</td></tr>
+            <tr><td class="num-cell">SN4700</td><td class="num-cell">20</td><td class="num-cell">18</td><td class="num-cell">2</td><td>16 เครื่องสำหรับเครือข่าย OOB, 2 เครื่องสำหรับเครือข่ายบริการ</td></tr>
+            <tr><td class="num-cell">SN5610</td><td class="num-cell">52</td><td class="num-cell">50</td><td class="num-cell">2</td><td>2 เครื่องเป็น OOB core, 48 เครื่องสำหรับเครือข่ายบริการ</td></tr>
+            <tr><td class="num-cell">QM3400</td><td class="num-cell">74</td><td class="num-cell">72</td><td class="num-cell">2</td><td>24 เครื่องเป็น core, 48 เครื่องเป็น access</td></tr>
+            <tr class="total"><td>รวม</td><td class="num-cell">195</td><td class="num-cell">187</td><td class="num-cell">8</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="sec" id="s2">
+      <div class="sec-head"><span class="num">02</span><h2>ลำดับความสำคัญในการติดตั้ง</h2></div>
+      <p class="lead">ลำดับนี้เรียงตาม “สิ่งที่ปลดล็อกงานถัดไปได้” ไม่ใช่ตามจำนวนหรือรุ่นของอุปกรณ์</p>
+      <div class="tablewrap">
+        <table>
+          <caption>ห้าลำดับงาน</caption>
+          <thead>
+            <tr><th>ลำดับ</th><th>ชุดงาน</th><th>ขอบเขตอุปกรณ์</th><th>เป้าหมาย</th></tr>
+          </thead>
+          <tbody>
+            <tr class="rowmark m-crit"><td>สูงสุด</td><td>เงื่อนไขก่อนดีบักระยะไกล</td><td>Jump server 2 เครื่อง, SN4700 ที่กำหนดไว้ 2 เครื่อง, ลิงก์ไฟร์วอลล์</td><td>ให้วิศวกร NVIDIA เข้าถึงเครือข่ายหน้างานจากระยะไกลได้</td></tr>
+            <tr class="rowmark m-oob"><td>ที่ 1</td><td>เครือข่าย OOB ของ OOB</td><td>SN2201 11 เครื่อง + SN4700 ที่กำหนดไว้ 2 เครื่อง</td><td>ขึ้นแร็ค จ่ายไฟ เข้าสาย โหลดคอนฟิกล่วงหน้า และเปิดช่องทางดีบักระยะไกล</td></tr>
+            <tr class="rowmark m-oob"><td>ที่ 2</td><td>เครือข่าย OOB เต็มรูปแบบ</td><td>SN2201 ที่เหลือ 36, SN4700 สำหรับ OOB 16, SN5610 2</td><td>ทันกำหนดส่งมอบ 8 ก.ย.</td></tr>
+            <tr class="rowmark m-inband"><td>ที่ 3</td><td>เครือข่ายบริการ (INBAND)</td><td>SN5610 48 เครื่อง, SN4700 ฝั่งบริการ 2 เครื่อง</td><td>ทันกำหนดส่งมอบ 20 ก.ย.</td></tr>
+            <tr class="rowmark m-ib"><td>ที่ 4</td><td>เครือข่ายเชื่อมต่อความเร็วสูง</td><td>QM3400 72 เครื่อง และระบบบริหารจัดการ</td><td>ทันกำหนดส่งมอบ 7 ต.ค.</td></tr>
+            <tr class="rowmark m-spare"><td>ท้ายสุด</td><td>เครื่องสำรอง</td><td>รุ่นละ 2 เครื่อง รวม 8 เครื่อง</td><td>ตรวจรับ ลงทะเบียน ปิดผนึก ไม่ใช้ทรัพยากรติดตั้ง</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="sec" id="s3">
+      <div class="sec-head"><span class="num">03</span><h2>ลำดับสูงสุด: เงื่อนไขสำหรับดีบักระยะไกล</h2><span class="chip c-crit">ก่อน 27 ส.ค.</span></div>
+      <p>ภายในวันที่ 27 ส.ค. ต้องติดตั้งระบบปฏิบัติการและเข้าสายหน้างานของ jump server สองเครื่องให้เสร็จ:</p>
+      <ul>
+        <li><span class="host">stt-dh61-d01u01-gmic-x86-cpu-001</span></li>
+        <li><span class="host">stt-dh61-d01u04-gmic-x86-cpu-002</span></li>
+      </ul>
+      <p>และเชื่อมต่อไปยัง SN4700 ที่กำหนดไว้สองเครื่อง:</p>
+      <ul>
+        <li><span class="host">stt-dh61-d07u43-cpu-oess-01</span></li>
+        <li><span class="host">stt-dh61-d07u47-oob-oess-01</span></li>
+      </ul>
+      <p>พร้อมกันนั้นต้องทำให้เสร็จด้วย:</p>
+      <ul>
+        <li>ลิงก์ระหว่าง <span class="host">stt-dh61-d07u47-oob-oess-01</span> กับไฟร์วอลล์ <span class="host">stt-dh61-d07u30-fe-01</span></li>
+        <li>ตั้งค่าที่อยู่ IP และระบบปฏิบัติการของ jump server</li>
+        <li>กำหนดการแจก IP แบบไดนามิก หรือกำหนด IP แบบคงที่</li>
+        <li>ตั้งค่า routing และ policy บนไฟร์วอลล์</li>
+        <li>ทดสอบการล็อกอินระยะไกล</li>
+      </ul>
+      <div class="note n-crit">
+        <h4>เกณฑ์ว่างานเสร็จ</h4>
+        <p>ไม่ใช่แค่ “ยกอุปกรณ์ขึ้นแร็คแล้ว” แต่คือวิศวกร NVIDIA ล็อกอินเข้าอุปกรณ์เครือข่ายหน้างานได้จากระยะไกล ผ่านไฟร์วอลล์และ jump server</p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="sec" id="s4">
+      <div class="sec-head"><span class="num">04</span><h2>ลำดับที่ 1: SN2201 จำนวน 11 เครื่อง</h2><span class="chip c-oob">OOB ของ OOB</span></div>
+      <p>จาก SN2201 ที่ใช้งานจริง 47 เครื่อง ให้ล็อกไว้ 11 เครื่องสำหรับเครือข่าย “OOB ของ OOB” เมื่ออุปกรณ์ถึงในวันที่ 27 ส.ค. 11 เครื่องนี้ต้องดำเนินการเป็นอันดับแรก:</p>
+      <ol class="steps">
+        <li>ตรวจรับและบันทึกหมายเลขซีเรียลกับข้อมูลตำแหน่งติดตั้ง</li>
+        <li>แกะกล่องและขนย้ายไปยังตู้แร็คที่กำหนด</li>
+        <li>ยกขึ้นแร็คและต่อไฟ</li>
+        <li>ติดตั้งออปติกโมดูล เดินสาย และเข้าพอร์ตบริหารจัดการ</li>
+        <li>ให้วิศวกรโหลดคอนฟิกที่เตรียมไว้ล่วงหน้า</li>
+        <li>ทดสอบการเชื่อมต่อกับ SN4700 ที่กำหนดไว้ 2 เครื่องและ jump server</li>
+        <li>ส่งมอบให้วิศวกร NVIDIA ทำการดีบักระยะไกลและทดสอบภาระงาน</li>
+      </ol>
+      <div class="note n-oob">
+        <h4>เป้าหมายควบคุมงาน</h4>
+        <p>ติดตั้งฮาร์ดแวร์และเชื่อมต่อพื้นฐานให้เสร็จภายในวันที่ 29 ส.ค. แล้วส่งต่อให้วิศวกร NVIDIA ดีบักทันที</p>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="sec" id="s5">
+      <div class="sec-head"><span class="num">05</span><h2>ลำดับที่ 2: เครือข่าย OOB เต็มรูปแบบ</h2><span class="chip c-oob">ส่งมอบ 8 ก.ย.</span></div>
+      <p>หลังจบชุดแรก 11 เครื่อง ให้ทำอุปกรณ์ OOB ที่เหลือต่อทันที ได้แก่ SN2201 อีก 36 เครื่อง, SN4700 สำหรับ OOB รวม 16 เครื่อง และ SN5610 core อีก 2 เครื่อง</p>
+      <div class="flow">core switch<span>→</span>aggregation switch<span>→</span>access switch<span>→</span>พอร์ต OOB ของอุปกรณ์ทั้งหมด</div>
+      <p>ขอบเขตงานโดยละเอียด:</p>
+      <ul>
+        <li>SN5610 จำนวน 2 เครื่อง เป็น OOB core switch</li>
+        <li>SN4700 จำนวน 16 เครื่อง เป็น OOB aggregation switch</li>
+        <li>SN2201 ที่เหลือ 36 เครื่อง เป็น access switch</li>
+        <li>เข้าพอร์ตบริหารจัดการของเซิร์ฟเวอร์ สตอเรจ อุปกรณ์เครือข่าย และอุปกรณ์อื่นทั้งหมด</li>
+        <li>ตั้งค่าและทดสอบการเชื่อมต่อระหว่างชั้น core / aggregation / access</li>
+      </ul>
+      <div class="note n-oob">
+        <h4>เกณฑ์ว่างานเสร็จ</h4>
+        <ul>
+          <li>เครือข่ายชั้น core, aggregation และ access เชื่อมถึงกันได้ทั้งหมด</li>
+          <li>ที่อยู่บริหารจัดการ OOB ทุกตัวล็อกอินได้</li>
+          <li>ผ่านการทดสอบลิงก์สำรองและการสลับเส้นทางเมื่อเกิดความผิดปกติ</li>
+          <li>รายการปัญหาถูกปิดครบ หรือมีผู้รับผิดชอบชัดเจน</li>
+          <li>เป็นไปตามข้อกำหนดส่งมอบเครือข่าย OOB วันที่ 8 ก.ย.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="sec" id="s6">
+      <div class="sec-head"><span class="num">06</span><h2>ลำดับที่ 3: เครือข่ายบริการ (INBAND)</h2><span class="chip c-inband">ส่งมอบ 20 ก.ย.</span></div>
+      <p>เครือข่ายบริการใช้ SN5610 จำนวน 48 เครื่อง และ SN4700 เป็น border switch อีก 2 เครื่อง</p>
+      <p>SN5610 ทั้ง 48 เครื่องแบ่งเป็น:</p>
+      <ul>
+        <li>core switch 16 เครื่อง</li>
+        <li>access switch 24 เครื่อง</li>
+        <li>access switch ของ control plane 2 เครื่อง</li>
+        <li>access switch สำหรับสตอเรจสมรรถนะสูง 6 เครื่อง</li>
+      </ul>
+      <div class="flow">border switch 2<span>→</span>core switch 16<span>→</span>access switch 32<span>→</span>ดีบักลิงก์</div>
+      <p>ระบบบริหารจัดการติดตั้งและตั้งค่าไปพร้อมกับช่วงนี้ได้เลย ไม่ต้องรอให้เครือข่ายความเร็วสูงขึ้นแร็คครบก่อน</p>
+      <div class="note n-inband">
+        <h4>เป้าหมาย</h4>
+        <p>ตั้งค่าเครือข่ายบริการ ทดสอบลิงก์ภายใน และส่งมอบให้เสร็จภายในวันที่ 20 ก.ย.</p>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="sec" id="s7">
+      <div class="sec-head"><span class="num">07</span><h2>ลำดับที่ 4: เครือข่ายเชื่อมต่อความเร็วสูง</h2><span class="chip c-ib">ส่งมอบ 7 ต.ค.</span></div>
+      <p>ใช้ QM3400 จำนวน 72 เครื่อง แบ่งเป็น core switch 24 เครื่อง และ access switch 48 เครื่อง อีก 2 เครื่องเก็บเป็นเครื่องสำรอง</p>
+      <p>ขอบเขตงาน:</p>
+      <ul>
+        <li>ยกอุปกรณ์ขึ้นแร็คและต่อไฟ</li>
+        <li>เดินสายและติดตั้งออปติกโมดูล</li>
+        <li>ติดตั้งระบบบริหารจัดการ</li>
+        <li>อัปเดตเฟิร์มแวร์และวางคอนฟิกพื้นฐาน</li>
+        <li>ทดสอบลิงก์ระหว่าง core กับ access</li>
+        <li>ทดสอบร่วมกับเซิร์ฟเวอร์ GB300</li>
+        <li>ตรวจผังเครือข่ายและสถานะสุขภาพของระบบ</li>
+      </ul>
+      <div class="note n-ib">
+        <h4>เป้าหมายสุดท้าย</h4>
+        <p>ส่งมอบเครือข่ายเชื่อมต่อความเร็วสูงให้เสร็จภายในวันที่ 7 ต.ค.</p>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="sec" id="s8">
+      <div class="sec-head"><span class="num">08</span><h2>การจัดโซนหน้างานวันที่ 27 ส.ค.</h2></div>
+      <p>เมื่ออุปกรณ์ถึงหน้างาน ให้แยกออกเป็นสามโซนทันที</p>
+      <div class="zones">
+        <div class="zone z1">
+          <span class="tag">โซนแดง</span>
+          <p><strong>อุปกรณ์ลำดับสูงสุด</strong><br>SN2201 11 เครื่อง และ SN4700 ที่กำหนดไว้ 2 เครื่อง ตรวจรับ แกะกล่อง และขึ้นแร็คก่อนใคร</p>
+        </div>
+        <div class="zone z2">
+          <span class="tag">โซนเหลือง</span>
+          <p><strong>อุปกรณ์ที่ใช้งานในเฟสถัดไป</strong><br>แยกวางตามเครือข่าย OOB / เครือข่ายบริการ / เครือข่ายความเร็วสูง ห้ามวางปนกัน</p>
+        </div>
+        <div class="zone z3">
+          <span class="tag">โซนเทา</span>
+          <p><strong>เครื่องสำรอง</strong><br>ตรวจเฉพาะบรรจุภัณฑ์ จำนวน ซีเรียล ตัวชี้วัดความชื้นและการกระแทก โดยหลักการไม่แกะกล่องและไม่ขึ้นแร็ค</p>
+        </div>
+      </div>
+      <div class="note">
+        <h4>ต้องเตรียมก่อนของถึง</h4>
+        <p>ตารางจัดสรรอุปกรณ์ที่ระบุ: รุ่น, หมายเลขซีเรียล, ชื่ออุปกรณ์, เครือข่ายที่สังกัด, หมายเลขตู้แร็ค, ตำแหน่ง U, วัตถุประสงค์, ลำดับความสำคัญ และที่อยู่บริหารจัดการ</p>
+      </div>
+      <div class="note n-crit">
+        <h4>ข้อควรระวังเรื่องการนับซ้ำ</h4>
+        <p>ต้องยืนยันว่า SN4700 ที่กำหนดไว้ 2 เครื่องนั้นอยู่ในกลุ่ม 16 เครื่องของเครือข่าย OOB หรืออยู่ในกลุ่ม 2 เครื่องของเครือข่ายบริการ ทั้งสองเครื่องเป็นสับเซ็ตที่ถูกจัดลำดับก่อนจาก 18 เครื่องที่ใช้งานจริงอยู่แล้ว ห้ามนับเพิ่มซ้ำ</p>
+      </div>
+      <p class="pull">สรุปสำหรับสื่อสารภายนอก: เมื่ออุปกรณ์ทั้งหมดถึงในวันที่ 27 ส.ค. เราจะไม่กระจายกำลังติดตั้งเฉลี่ยตามรุ่น แต่จะทำอุปกรณ์ที่ปลดล็อกการดีบักระยะไกลและงานก่อสร้างเครือข่ายช่วงถัดไปก่อน — เฟสแรกคือ jump server, SN4700 ที่กำหนดไว้ 2 เครื่อง และ SN2201 11 เครื่อง เฟสสองคือเครือข่าย OOB ทั้งหมด เฟสสามคือเครือข่ายบริการ เฟสสี่คือเครือข่ายความเร็วสูง ส่วนเครื่องสำรองทำเพียงตรวจรับและลงทะเบียนคลัง ไม่ดึงทรัพยากรติดตั้งที่เป็นคอขวด</p>
+    </section>
+
+    <!-- 9 -->
+    <section class="sec" id="s9">
+      <div class="sec-head"><span class="num">09</span><h2>ตารางเวลาการทำงาน</h2></div>
+
+      <div class="tablewrap">
+        <table>
+          <caption>ภาพรวม: อุปกรณ์ถึง / วัสดุถึง / กำหนดส่งมอบ</caption>
+          <thead><tr><th>ชุดงาน</th><th>อุปกรณ์ถึง</th><th>วัสดุสิ้นเปลือง</th><th>กำหนดส่งมอบ</th></tr></thead>
+          <tbody>
+            <tr class="rowmark m-oob"><td>OOB for OOB SW — SN2201</td><td>SN2201 49 เครื่อง 27 ส.ค.</td><td>CED จัดซื้อเพิ่ม สาย MPO เส้นสั้น</td><td>OOB 8 ก.ย.</td></tr>
+            <tr class="rowmark m-oob"><td>OOB SW — SN2201 / SN4700</td><td>SN4700 20 เครื่อง 27 ส.ค.</td><td>Macnica ส่งสาย MPO ทั้งหมด 11,782 เส้น (1 ส.ค. 7,786 เส้น; 27 ส.ค. 2,771 / 495 / 730 เส้น)</td><td>—</td></tr>
+            <tr class="rowmark m-inband"><td>INBAND SW — SN5610 / SN4700 2 เครื่อง</td><td>SN4700 20 เครื่อง 10 ส.ค.; SN5610 52 เครื่อง 10 ส.ค.</td><td>—</td><td>INBAND 20 ก.ย.</td></tr>
+            <tr class="rowmark m-ib"><td>INFINIBAND SW — QM3400 &amp; UFM</td><td>QM3400 74 เครื่อง 10 ส.ค.</td><td>—</td><td>IB เสร็จ 7 ต.ค.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tablewrap">
+        <table class="sub">
+          <caption>1 · OOB for OOB SW — SN2201</caption>
+          <thead><tr><th>งาน</th><th>รายละเอียด / สถานะ</th><th>วันที่</th></tr></thead>
+          <tbody>
+            <tr><th>SN2201 11 เครื่อง (OOB for OOB)</th><td>กำหนดเดิม 10 ส.ค. — ของถึงจริง 24 ส.ค.</td><td class="num-cell">24 ส.ค.</td></tr>
+            <tr><th>ออปติกโมดูล 100G</th><td>โมดูลตามลิสต์ของ KEYWIN</td><td class="num-cell">3–4 ส.ค.</td></tr>
+            <tr><th>สาย MPO 100G</th><td>ของถึงบางส่วนแล้ว + CED จัดซื้อเพิ่ม ส่งของแล้ว 10 ส.ค. ถึงก่อน 30 ส.ค.</td><td class="num-cell">ก่อน 30 ส.ค.</td></tr>
+            <tr><th>เครื่อง CPU 18 เครื่อง (ต้องการ 2+3)</th><td>อุปกรณ์ 24 เครื่องถึง 12 ส.ค., ขึ้นแร็ค–ต่อไฟ–เข้าสายเสร็จ 16 ส.ค. · CED รับผิดชอบติดตั้ง OS: 5 เครื่องให้ NVIS และ 2 เครื่อง DHCP ที่ SRE ต้องใช้ (SRE remote, CED ติดตั้ง OS และ IP) · CED ต้องยืนยันว่ามีสายและออปติกโมดูลพอสำหรับต่อ 2 เครื่องนี้เข้ากับ OOB for OOB · SRE รอ OOB for OOB เสร็จ 1 ก.ย. แล้วทดสอบภาระงาน 7 เครื่อง ส่งให้ NVIS 5 เครื่อง ส่วนอีก 11 เครื่องรอ INBAND เสร็จ 20 ก.ย. จึงทดสอบภาระงาน 2 วัน แล้วส่งให้ Jian Feng ทีม R&amp;D วันที่ 22 ก.ย.</td><td class="num-cell">12–16 ส.ค.</td></tr>
+            <tr><th>CED ขึ้นแร็ค 11 เครื่อง</th><td>กำหนดเดิม 10–15 ส.ค. — SN2201 11 เครื่องขึ้นแร็ค ต่อไฟ เข้าสายเสร็จ 26 ส.ค. แล้วส่งให้ NVIS วันเดียวกัน</td><td class="num-cell">26 ส.ค.</td></tr>
+            <tr><th>KEYWIN เข้าหน้างาน</th><td>เข้าหน้างาน 17 ส.ค. ส่งมอบให้ NVIS 19 ส.ค.</td><td class="num-cell">17 / 19 ส.ค.</td></tr>
+            <tr><th>OOB for OOB เสร็จสมบูรณ์</th><td>—</td><td class="num-cell">26 ส.ค.</td></tr>
+            <tr><th>NVIS ดีบัก OOB for OOB เสร็จ</th><td>—</td><td class="num-cell">1 ก.ย.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tablewrap">
+        <table class="sub">
+          <caption>2 · OOB SW — SN2201 / SN4700</caption>
+          <thead><tr><th>งาน</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>
+            <tr><th>SN4700 20 เครื่องถึง</th><td class="num-cell">24 ส.ค.</td><td>ต้องขอ Serial Number และ MAC Address ทั้งหมดของเครื่องหลัก Avires (BMC MAC และ Network MAC)</td></tr>
+            <tr><th>ขึ้นแร็ค ต่อไฟ เข้าสาย</th><td class="num-cell">27 ส.ค.</td><td>—</td></tr>
+            <tr><th>NVIS ทำ OOB เสร็จ</th><td class="num-cell">2 ก.ย.</td><td>—</td></tr>
+            <tr><th>ดีบักลิงก์ leaf ↔ spine</th><td class="num-cell">4 ก.ย.</td><td>NVIS ยืนยันว่าใช้เวลา 2 วัน ช้าสุดไม่เกิน 19 ก.ย.</td></tr>
+            <tr><th>ดีบัก OOB ระหว่าง leaf ↔ GB300</th><td class="num-cell">ทำคู่ขนานกับ L12</td><td>ต้องรอ GB300 L11 เสร็จก่อน NVIS ยืนยันว่าใช้เวลา 2 วัน</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tablewrap">
+        <table class="sub">
+          <caption>3 · INBAND SW — SN5610 / SN4700 2 เครื่อง</caption>
+          <thead><tr><th>งาน</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>
+            <tr><th>SN5610 52 เครื่องถึง</th><td class="num-cell">24 ส.ค.</td><td>เดินสายเสร็จ 20 ส.ค.</td></tr>
+            <tr><th>ขึ้นแร็ค ต่อไฟ เข้าสาย</th><td class="num-cell">2 ก.ย.</td><td>—</td></tr>
+            <tr><th>ดีบักลิงก์ leaf ↔ spine</th><td class="num-cell">6 ก.ย.</td><td>NVIS ยืนยันว่าใช้เวลา 2 วัน ช้าสุดไม่เกิน 19 ก.ย.</td></tr>
+            <tr><th>ดีบัก INBAND ระหว่าง leaf ↔ GB300</th><td class="num-cell">ทำคู่ขนานกับ L12</td><td>ต้องรอ GB300 L11 เสร็จก่อน NVIS ยืนยันว่าใช้เวลา 2 วัน</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tablewrap">
+        <table class="sub">
+          <caption>4 · INFINIBAND SW — QM3400 &amp; UFM</caption>
+          <thead><tr><th>งาน</th><th>วันที่</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>
+            <tr><th>QM3400 74 เครื่องถึง</th><td class="num-cell">30 ส.ค.</td><td>เป็นสมมติฐาน ยังไม่ยืนยัน</td></tr>
+            <tr><th>ขึ้นแร็ค ต่อไฟ เข้าสาย</th><td class="num-cell">14 ก.ย.</td><td>ในเอกสารต้นฉบับมีทั้ง 1 ก.ย. และ 14 ก.ย. ต้องยืนยัน</td></tr>
+            <tr><th>ดีบักลิงก์ leaf ↔ spine</th><td class="num-cell">17 ก.ย.</td><td>NVIS ยืนยันว่าใช้เวลา 2 วัน ช้าสุดไม่เกิน 19 ก.ย.</td></tr>
+            <tr><th>ดีบัก InfiniBand ระหว่าง leaf ↔ GB300</th><td class="num-cell">ทำคู่ขนานกับ L12</td><td>ต้องรอ GB300 L11 เสร็จก่อน NVIS ยืนยันว่าใช้เวลา 2 วัน</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="sec" id="s10">
+      <div class="sec-head"><span class="num">10</span><h2>ตู้ GPU และการเปิดใช้วงจรสื่อสาร</h2></div>
+      <div class="tablewrap">
+        <table>
+          <caption>GIGA L11 — ชุดละ 10 วัน</caption>
+          <thead><tr><th>ชุด</th><th>เริ่ม L11</th><th>เสร็จ L11</th><th>ต่อน้ำ–ต่อไฟ</th><th>ทดสอบจ่ายไฟ</th><th>ต่อสวิตช์ SN2201 ในตู้</th></tr></thead>
+          <tbody>
+            <tr><td>ชุดที่ 1 — ตู้ GPU 20 ตู้</td><td class="num-cell">9 ก.ย.</td><td class="num-cell">19 ก.ย.</td><td class="num-cell">11 ก.ย.</td><td class="num-cell">11 ก.ย.</td><td class="num-cell">12 ก.ย.</td></tr>
+            <tr><td>ชุดที่ 2 — ตู้ GPU 20 ตู้</td><td class="num-cell">16 ก.ย.</td><td class="num-cell">26 ก.ย.</td><td class="num-cell">18 ก.ย.</td><td class="num-cell">18 ก.ย.</td><td class="num-cell">19 ก.ย.</td></tr>
+            <tr><td>ชุดที่ 3 — ตู้ GPU 8 ตู้</td><td class="num-cell">18 ก.ย.</td><td class="num-cell">28 ก.ย.</td><td class="num-cell">20 ก.ย.</td><td class="num-cell">20 ก.ย.</td><td class="num-cell">21 ก.ย.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <caption>วงจรสื่อสาร</caption>
+          <thead><tr><th>รายการ</th><th>วันที่</th><th>เงื่อนไข</th></tr></thead>
+          <tbody>
+            <tr><td>เปิดใช้วงจรเช่า (leased line)</td><td class="num-cell">25 ก.ย.</td><td>ขอเพียงให้เสร็จก่อนส่งมอบให้ลูกค้า</td></tr>
+            <tr><td>เปิดใช้อินเทอร์เน็ตสาธารณะ</td><td class="num-cell">12 ส.ค.</td><td>ทดสอบเสร็จ 20 ส.ค. และเชื่อมต่อเข้ากับ INBAND</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <h4>สถานะที่ระบุไว้ในผังต้นฉบับ</h4>
+        <p>ส่วนขาออกอินเทอร์เน็ต (ISP1 / ISP2 → Dell S5448F-ON ×2 → ไฟร์วอลล์ 1801F ×2) ทำเสร็จแล้ว</p>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="sec" id="s11">
+      <div class="sec-head"><span class="num">11</span><h2>สเปกอุปกรณ์และผังพอร์ต OOB</h2></div>
+      <div class="tablewrap">
+        <table>
+          <caption>ขนาดและการยึดตู้</caption>
+          <thead><tr><th>รายการ</th><th>Q3400-RA</th><th>SN5610</th><th>SN4700</th><th>SN2201</th></tr></thead>
+          <tbody>
+            <tr><th>ความสูง</th><td class="num-cell">4U</td><td class="num-cell">2U</td><td class="num-cell">1U</td><td class="num-cell">1U</td></tr>
+            <tr><th>น้ำหนัก</th><td class="num-cell">ประมาณ 60 กก.</td><td class="num-cell">26.9 กก.</td><td class="num-cell">11.6 กก.</td><td class="num-cell">7.41 กก.</td></tr>
+            <tr><th>ความลึก</th><td class="num-cell">850 มม.</td><td class="num-cell">796 มม.</td><td class="num-cell">568.5 มม.</td><td class="num-cell">432 มม.</td></tr>
+            <tr><th>ราง</th><td>มีราง</td><td>ไม่มีราง ใช้หูยึด</td><td>ไม่มีราง ใช้หูยึด</td><td>ไม่มีราง ใช้หูยึด</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <caption>ผังอุปกรณ์เครือข่าย OOB</caption>
+          <thead><tr><th>ชั้น</th><th>บทบาท</th><th>รุ่น</th><th>จำนวน</th></tr></thead>
+          <tbody>
+            <tr><td>Core</td><td>OOB Core Switch</td><td class="num-cell">SN5610-C2P</td><td class="num-cell">2</td></tr>
+            <tr><td>Spine</td><td>Management — OOB-GB300</td><td class="num-cell">MSN4700-WS2RC</td><td class="num-cell">12</td></tr>
+            <tr><td>Spine</td><td>Management — OOB-Storage</td><td class="num-cell">MSN4700-WS2RC</td><td class="num-cell">2</td></tr>
+            <tr><td>Spine</td><td>Management — OOB-CP-PDU-Misc.</td><td class="num-cell">MSN4700-WS2RC</td><td class="num-cell">2</td></tr>
+            <tr><td>Leaf</td><td>Management — OOB สำหรับ GPU / CPU / Storage</td><td class="num-cell">MSN2201-CB2RC</td><td class="num-cell">36</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note n-oob">
+        <h4>ลำดับงานหน้างานของชุด 11 เครื่อง</h4>
+        <p>ขึ้นแร็ค 47 เครื่อง → SN2201 11 เครื่องสำหรับ OOB for OOB → jump server → เข้าสาย P2P temp12 → เมื่อไฟติดครบทั้ง 11 เครื่อง ให้ทีม CCNA โหลดคอนฟิกทั้ง 11 เครื่อง → ประสานคุณอู๋เพื่อดีบัก → ทดสอบภาระงานทั้ง 11 เครื่อง</p>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="sec" id="s12">
+      <div class="sec-head"><span class="num">12</span><h2>จุดที่ต้องยืนยัน</h2><span class="chip c-crit">ค้างอยู่</span></div>
+      <p>ข้อมูลต่อไปนี้ในเอกสารต้นฉบับขัดแย้งกันเองหรือยังไม่ระบุ ควรเคลียร์ก่อนวันที่ 27 ส.ค.</p>
+      <ul>
+        <li><strong>วันที่อุปกรณ์ถึงจริง</strong> — เนื้อหาส่วนแผนระบุว่าอุปกรณ์ทั้งหมดถึง 27 ส.ค. แต่ตารางระบุ SN2201 / SN4700 / SN5610 ถึงวันที่ 24 ส.ค. และมีบันทึกว่า “ของจะถึงวันที่ 27”</li>
+        <li><strong>จำนวนตู้ GPU ชุดแรก</strong> — ตารางกำหนดการเขียนว่า 20 ตู้ แต่รายการสรุปท้ายเอกสารเขียนว่า 17 ตู้</li>
+        <li><strong>วันขึ้นแร็ค InfiniBand</strong> — ระบุทั้ง 1 ก.ย. และ 14 ก.ย.</li>
+        <li><strong>SN4700 ที่กำหนดไว้ 2 เครื่อง</strong> — ต้องระบุให้ชัดว่านับอยู่ในกลุ่ม OOB 16 เครื่อง หรือกลุ่มบริการ 2 เครื่อง</li>
+        <li><strong>วันเปิดใช้วงจรเช่า</strong> — ในรายการสรุปยังทำเครื่องหมายคำถามไว้ แม้ตารางจะระบุ 25 ก.ย.</li>
+        <li><strong>UFM</strong> — ในรายการสรุปเขียนกำกับว่า 27 แต่ไม่ระบุว่าเป็นจำนวนเครื่องหรือวันที่</li>
+        <li><strong>ข้อมูลที่ยังต้องขอ</strong> — Serial Number และ MAC Address ทั้งหมด (BMC และ Network) ของเครื่องหลัก Avires</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>แปลจากเอกสารต้นฉบับภาษาจีน “设备总量核对” ลงวันที่ 20 ส.ค. 2026</span>
+    <span>วันที่ทั้งหมดเป็นปี ค.ศ. 2026</span>
+  </div>
+</footer>
+
+</body>
+</html>
